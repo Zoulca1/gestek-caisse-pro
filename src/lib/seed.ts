@@ -1,5 +1,5 @@
 import type {
-  Product, Client, Supplier, Sale, StockEntry, Transfer, Store, CompanyInfo,
+  Product, Client, Supplier, Sale, SaleItem, StockEntry, Transfer, Store, CompanyInfo,
 } from "./types";
 
 export const STORES: Store[] = [
