@@ -9,8 +9,62 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VenteRouteImport } from './routes/vente'
+import { Route as TransfertsRouteImport } from './routes/transferts'
+import { Route as RapportsRouteImport } from './routes/rapports'
+import { Route as ProduitsRouteImport } from './routes/produits'
+import { Route as ParametresRouteImport } from './routes/parametres'
+import { Route as FournisseursRouteImport } from './routes/fournisseurs'
+import { Route as EntreesRouteImport } from './routes/entrees'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ClientsRouteImport } from './routes/clients'
 import { Route as IndexRouteImport } from './routes/index'
 
+const VenteRoute = VenteRouteImport.update({
+  id: '/vente',
+  path: '/vente',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TransfertsRoute = TransfertsRouteImport.update({
+  id: '/transferts',
+  path: '/transferts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RapportsRoute = RapportsRouteImport.update({
+  id: '/rapports',
+  path: '/rapports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProduitsRoute = ProduitsRouteImport.update({
+  id: '/produits',
+  path: '/produits',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ParametresRoute = ParametresRouteImport.update({
+  id: '/parametres',
+  path: '/parametres',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FournisseursRoute = FournisseursRouteImport.update({
+  id: '/fournisseurs',
+  path: '/fournisseurs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EntreesRoute = EntreesRouteImport.update({
+  id: '/entrees',
+  path: '/entrees',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClientsRoute = ClientsRouteImport.update({
+  id: '/clients',
+  path: '/clients',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +73,158 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/clients': typeof ClientsRoute
+  '/dashboard': typeof DashboardRoute
+  '/entrees': typeof EntreesRoute
+  '/fournisseurs': typeof FournisseursRoute
+  '/parametres': typeof ParametresRoute
+  '/produits': typeof ProduitsRoute
+  '/rapports': typeof RapportsRoute
+  '/transferts': typeof TransfertsRoute
+  '/vente': typeof VenteRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/clients': typeof ClientsRoute
+  '/dashboard': typeof DashboardRoute
+  '/entrees': typeof EntreesRoute
+  '/fournisseurs': typeof FournisseursRoute
+  '/parametres': typeof ParametresRoute
+  '/produits': typeof ProduitsRoute
+  '/rapports': typeof RapportsRoute
+  '/transferts': typeof TransfertsRoute
+  '/vente': typeof VenteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/clients': typeof ClientsRoute
+  '/dashboard': typeof DashboardRoute
+  '/entrees': typeof EntreesRoute
+  '/fournisseurs': typeof FournisseursRoute
+  '/parametres': typeof ParametresRoute
+  '/produits': typeof ProduitsRoute
+  '/rapports': typeof RapportsRoute
+  '/transferts': typeof TransfertsRoute
+  '/vente': typeof VenteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/clients'
+    | '/dashboard'
+    | '/entrees'
+    | '/fournisseurs'
+    | '/parametres'
+    | '/produits'
+    | '/rapports'
+    | '/transferts'
+    | '/vente'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/clients'
+    | '/dashboard'
+    | '/entrees'
+    | '/fournisseurs'
+    | '/parametres'
+    | '/produits'
+    | '/rapports'
+    | '/transferts'
+    | '/vente'
+  id:
+    | '__root__'
+    | '/'
+    | '/clients'
+    | '/dashboard'
+    | '/entrees'
+    | '/fournisseurs'
+    | '/parametres'
+    | '/produits'
+    | '/rapports'
+    | '/transferts'
+    | '/vente'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ClientsRoute: typeof ClientsRoute
+  DashboardRoute: typeof DashboardRoute
+  EntreesRoute: typeof EntreesRoute
+  FournisseursRoute: typeof FournisseursRoute
+  ParametresRoute: typeof ParametresRoute
+  ProduitsRoute: typeof ProduitsRoute
+  RapportsRoute: typeof RapportsRoute
+  TransfertsRoute: typeof TransfertsRoute
+  VenteRoute: typeof VenteRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/vente': {
+      id: '/vente'
+      path: '/vente'
+      fullPath: '/vente'
+      preLoaderRoute: typeof VenteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/transferts': {
+      id: '/transferts'
+      path: '/transferts'
+      fullPath: '/transferts'
+      preLoaderRoute: typeof TransfertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rapports': {
+      id: '/rapports'
+      path: '/rapports'
+      fullPath: '/rapports'
+      preLoaderRoute: typeof RapportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/produits': {
+      id: '/produits'
+      path: '/produits'
+      fullPath: '/produits'
+      preLoaderRoute: typeof ProduitsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/parametres': {
+      id: '/parametres'
+      path: '/parametres'
+      fullPath: '/parametres'
+      preLoaderRoute: typeof ParametresRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fournisseurs': {
+      id: '/fournisseurs'
+      path: '/fournisseurs'
+      fullPath: '/fournisseurs'
+      preLoaderRoute: typeof FournisseursRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/entrees': {
+      id: '/entrees'
+      path: '/entrees'
+      fullPath: '/entrees'
+      preLoaderRoute: typeof EntreesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/clients': {
+      id: '/clients'
+      path: '/clients'
+      fullPath: '/clients'
+      preLoaderRoute: typeof ClientsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,16 +237,16 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ClientsRoute: ClientsRoute,
+  DashboardRoute: DashboardRoute,
+  EntreesRoute: EntreesRoute,
+  FournisseursRoute: FournisseursRoute,
+  ParametresRoute: ParametresRoute,
+  ProduitsRoute: ProduitsRoute,
+  RapportsRoute: RapportsRoute,
+  TransfertsRoute: TransfertsRoute,
+  VenteRoute: VenteRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
