@@ -102,7 +102,7 @@ function Dashboard() {
                 <YAxis stroke="var(--color-muted-foreground)" fontSize={11} tickFormatter={(v) => (v / 1000) + "k"} />
                 <Tooltip
                   contentStyle={{ background: "var(--color-card)", border: "1px solid var(--color-border)", borderRadius: 8, fontSize: 12 }}
-                  formatter={(v: number) => fcfa(v)}
+                  formatter={(v: any) => fcfa(Number(v))}
                 />
                 <Bar dataKey="prev" fill="var(--color-primary)" fillOpacity={0.2} radius={[4, 4, 0, 0]} />
                 <Bar dataKey="cur" fill="var(--color-primary)" radius={[4, 4, 0, 0]} />
