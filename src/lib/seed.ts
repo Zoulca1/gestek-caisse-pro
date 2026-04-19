@@ -106,9 +106,6 @@ export function generateSeedSales(): Sale[] {
   return sales;
 }
 
-type SaleItem = SaleItem_;
-import type { SaleItem as SaleItem_ } from "./types";
-
 export const SEED_ENTRIES: StockEntry[] = [
   { id: "e1", number: "BON-001", date: addDays(-10), supplierId: "s2", supplierName: "CDCI Abidjan", productId: "p1", productName: "Huile Dinor 1L", qty: 60, unitBuyPrice: 1100, expiry: addDays(180) },
   { id: "e2", number: "BON-002", date: addDays(-7), supplierId: "s4", supplierName: "Brasseries Abidjan", productId: "p9", productName: "Bière Castel 65cl", qty: 120, unitBuyPrice: 600, expiry: addDays(110) },
