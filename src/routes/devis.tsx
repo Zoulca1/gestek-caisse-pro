@@ -160,7 +160,7 @@ function DevisPage() {
       {editing && (
         <QuoteEditor q={editing} products={products} clients={clients}
           onClose={() => setEditing(null)} onSave={saveQuote}
-          onPreview={(q) => { saveQuote(q); setPreviewing({ ...q, total: computeTotal(q.lines, q.globalDiscount) }); }} />
+          onPreview={(qq: Quote) => { saveQuote(qq); setPreviewing({ ...qq, total: computeTotal(qq.lines, qq.globalDiscount) }); }} />
       )}
       {previewing && <QuotePreview q={previewing} company={company} onClose={() => setPreviewing(null)} />}
     </div>

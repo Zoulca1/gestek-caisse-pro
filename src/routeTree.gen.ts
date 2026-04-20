@@ -16,7 +16,10 @@ import { Route as ProduitsRouteImport } from './routes/produits'
 import { Route as ParametresRouteImport } from './routes/parametres'
 import { Route as FournisseursRouteImport } from './routes/fournisseurs'
 import { Route as EntreesRouteImport } from './routes/entrees'
+import { Route as EmployesRouteImport } from './routes/employes'
+import { Route as DevisRouteImport } from './routes/devis'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ComptabiliteRouteImport } from './routes/comptabilite'
 import { Route as ClientsRouteImport } from './routes/clients'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -55,9 +58,24 @@ const EntreesRoute = EntreesRouteImport.update({
   path: '/entrees',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmployesRoute = EmployesRouteImport.update({
+  id: '/employes',
+  path: '/employes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevisRoute = DevisRouteImport.update({
+  id: '/devis',
+  path: '/devis',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComptabiliteRoute = ComptabiliteRouteImport.update({
+  id: '/comptabilite',
+  path: '/comptabilite',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ClientsRoute = ClientsRouteImport.update({
@@ -74,7 +92,10 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/clients': typeof ClientsRoute
+  '/comptabilite': typeof ComptabiliteRoute
   '/dashboard': typeof DashboardRoute
+  '/devis': typeof DevisRoute
+  '/employes': typeof EmployesRoute
   '/entrees': typeof EntreesRoute
   '/fournisseurs': typeof FournisseursRoute
   '/parametres': typeof ParametresRoute
@@ -86,7 +107,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/clients': typeof ClientsRoute
+  '/comptabilite': typeof ComptabiliteRoute
   '/dashboard': typeof DashboardRoute
+  '/devis': typeof DevisRoute
+  '/employes': typeof EmployesRoute
   '/entrees': typeof EntreesRoute
   '/fournisseurs': typeof FournisseursRoute
   '/parametres': typeof ParametresRoute
@@ -99,7 +123,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/clients': typeof ClientsRoute
+  '/comptabilite': typeof ComptabiliteRoute
   '/dashboard': typeof DashboardRoute
+  '/devis': typeof DevisRoute
+  '/employes': typeof EmployesRoute
   '/entrees': typeof EntreesRoute
   '/fournisseurs': typeof FournisseursRoute
   '/parametres': typeof ParametresRoute
@@ -113,7 +140,10 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/clients'
+    | '/comptabilite'
     | '/dashboard'
+    | '/devis'
+    | '/employes'
     | '/entrees'
     | '/fournisseurs'
     | '/parametres'
@@ -125,7 +155,10 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/clients'
+    | '/comptabilite'
     | '/dashboard'
+    | '/devis'
+    | '/employes'
     | '/entrees'
     | '/fournisseurs'
     | '/parametres'
@@ -137,7 +170,10 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/clients'
+    | '/comptabilite'
     | '/dashboard'
+    | '/devis'
+    | '/employes'
     | '/entrees'
     | '/fournisseurs'
     | '/parametres'
@@ -150,7 +186,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ClientsRoute: typeof ClientsRoute
+  ComptabiliteRoute: typeof ComptabiliteRoute
   DashboardRoute: typeof DashboardRoute
+  DevisRoute: typeof DevisRoute
+  EmployesRoute: typeof EmployesRoute
   EntreesRoute: typeof EntreesRoute
   FournisseursRoute: typeof FournisseursRoute
   ParametresRoute: typeof ParametresRoute
@@ -211,11 +250,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EntreesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/employes': {
+      id: '/employes'
+      path: '/employes'
+      fullPath: '/employes'
+      preLoaderRoute: typeof EmployesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/devis': {
+      id: '/devis'
+      path: '/devis'
+      fullPath: '/devis'
+      preLoaderRoute: typeof DevisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/comptabilite': {
+      id: '/comptabilite'
+      path: '/comptabilite'
+      fullPath: '/comptabilite'
+      preLoaderRoute: typeof ComptabiliteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/clients': {
@@ -238,7 +298,10 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ClientsRoute: ClientsRoute,
+  ComptabiliteRoute: ComptabiliteRoute,
   DashboardRoute: DashboardRoute,
+  DevisRoute: DevisRoute,
+  EmployesRoute: EmployesRoute,
   EntreesRoute: EntreesRoute,
   FournisseursRoute: FournisseursRoute,
   ParametresRoute: ParametresRoute,
