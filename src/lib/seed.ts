@@ -1,5 +1,6 @@
 import type {
   Product, Client, Supplier, Sale, SaleItem, StockEntry, Transfer, Store, CompanyInfo,
+  Expense, SupplierDebt, Quote, Employee, SalaryAdvance, SalaryPayment,
 } from "./types";
 
 export const STORES: Store[] = [
@@ -15,6 +16,7 @@ export const COMPANY: CompanyInfo = {
   email: "contact@epicerie-koffi.ci",
   rccm: "CI-ABJ-2019-B-12345",
   cc: "CC-1903456 P",
+  monthlyGoal: 3500000,
 };
 
 const today = new Date();
@@ -44,7 +46,6 @@ export const SEED_PRODUCTS: Product[] = [
   { id: "p17", emoji: "🧃", name: "Jus Tampico 1L", ref: "TAM-1L", barcode: "6017234567806", category: "Boissons", buyPrice: 600, sellPrice: 850, stockByStore: { yopougon: 40, selmer: 20, abobo: 12 }, threshold: 15, expiry: addDays(80) },
   { id: "p18", emoji: "🥚", name: "Mayonnaise Amora 175ml", ref: "AMO-175", barcode: "6018234567807", category: "Condiments", buyPrice: 1300, sellPrice: 1700, stockByStore: { yopougon: 22, selmer: 10, abobo: 6 }, threshold: 10, expiry: addDays(140) },
   { id: "p19", emoji: "🔥", name: "Allumettes (boîte de 10)", ref: "ALL-10", barcode: "6019234567808", category: "Divers", buyPrice: 200, sellPrice: 300, stockByStore: { yopougon: 60, selmer: 30, abobo: 20 }, threshold: 20, expiry: addDays(900) },
-  // Produits en alerte
   { id: "p20", emoji: "🧈", name: "Beurre Président 250g", ref: "PRE-250", barcode: "6020234567809", category: "Produits laitiers", buyPrice: 1800, sellPrice: 2400, stockByStore: { yopougon: 2, selmer: 1, abobo: 0 }, threshold: 10, expiry: addDays(8) },
   { id: "p21", emoji: "🍫", name: "Chocolat Kinder 100g", ref: "KIN-100", barcode: "6021234567810", category: "Snacks", buyPrice: 1100, sellPrice: 1500, stockByStore: { yopougon: 0, selmer: 0, abobo: 0 }, threshold: 12, expiry: addDays(60) },
 ];
@@ -95,9 +96,7 @@ export function generateSeedSales(): Sale[] {
         date: date.toISOString(),
         clientId: Math.random() > 0.4 ? client.id : null,
         clientName: Math.random() > 0.4 ? client.name : "Client passant",
-        items,
-        total,
-        profit,
+        items, total, profit,
         payment: PAYMENTS[Math.floor(Math.random() * PAYMENTS.length)],
       });
       counter++;
@@ -117,3 +116,108 @@ export const SEED_TRANSFERS: Transfer[] = [
   { id: "t1", number: "TR-001", date: addDays(-5), fromStore: "yopougon", toStore: "selmer", productId: "p1", productName: "Huile Dinor 1L", qty: 20 },
   { id: "t2", number: "TR-002", date: addDays(-3), fromStore: "yopougon", toStore: "abobo", productId: "p7", productName: "Coca-Cola 1.5L", qty: 30 },
 ];
+
+/* ===== Comptabilité ===== */
+export function generateSeedExpenses(): Expense[] {
+  const out: Expense[] = [];
+  const samples: Array<[Expense["category"], string, number]> = [
+    ["Loyer", "Loyer mensuel boutique Selmer", 250000],
+    ["Salaires", "Acompte caissière", 50000],
+    ["Électricité", "Facture CIE mai", 78000],
+    ["Eau", "Facture SODECI", 18500],
+    ["Internet", "Abonnement Orange Pro", 35000],
+    ["Transport", "Carburant livraison", 22000],
+    ["Achat marchandise", "Réassort huile + sucre", 320000],
+    ["Taxes", "Patente trimestre", 45000],
+    ["Autre", "Réparation frigo", 28000],
+    ["Transport", "Course taxi marché Adjamé", 7500],
+  ];
+  samples.forEach((s, i) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i * 2);
+    out.push({
+      id: "exp-" + (i + 1),
+      date: d.toISOString(),
+      category: s[0],
+      description: s[1],
+      amount: s[2],
+      createdBy: "Konan Admin",
+    });
+  });
+  return out;
+}
+
+/* ===== Dettes fournisseurs ===== */
+export const SEED_SUPPLIER_DEBTS: SupplierDebt[] = [
+  { id: "d1", supplierId: "s2", supplierName: "CDCI Abidjan", amount: 480000, purchaseDate: addDays(-10), dueDate: addDays(20), description: "Réassort général mai", status: "open" },
+  { id: "d2", supplierId: "s4", supplierName: "Brasseries Abidjan", amount: 320000, purchaseDate: addDays(-18), dueDate: addDays(7), description: "Casiers Castel 65cl x 50", status: "open" },
+  { id: "d3", supplierId: "s3", supplierName: "NESTLÉ CI", amount: 180000, purchaseDate: addDays(-25), dueDate: addDays(-3), description: "Lait Nido 400g x 80", status: "open" },
+  { id: "d4", supplierId: "s5", supplierName: "UNILEVER CI", amount: 140000, purchaseDate: addDays(-6), dueDate: addDays(40), description: "OMO + Colgate", status: "open" },
+  { id: "d5", supplierId: "s1", supplierName: "SODICAF", amount: 95000, purchaseDate: addDays(-30), dueDate: addDays(-8), description: "Café Nescafé carton x 5", status: "open" },
+];
+
+/* ===== Devis ===== */
+export const SEED_QUOTES: Quote[] = [
+  {
+    id: "q1", number: "DEV-0001", date: addDays(-5), validity: addDays(25),
+    clientId: "c1", clientName: "Aya Konan",
+    lines: [
+      { productId: "p1", name: "Huile Dinor 1L", qty: 12, unitPrice: 1400, discount: 0 },
+      { productId: "p3", name: "Sucre Princier 1kg", qty: 20, unitPrice: 850, discount: 5 },
+    ],
+    globalDiscount: 0, total: 12 * 1400 + 20 * 850 * 0.95,
+    notes: "Livraison gratuite à Cocody.", status: "Envoyé",
+  },
+  {
+    id: "q2", number: "DEV-0002", date: addDays(-12), validity: addDays(18),
+    clientId: "c6", clientName: "Fatou Diallo",
+    lines: [
+      { productId: "p2", name: "Riz Uncle Ben's 5kg", qty: 6, unitPrice: 7200, discount: 0 },
+      { productId: "p7", name: "Coca-Cola 1.5L", qty: 24, unitPrice: 1000, discount: 0 },
+    ],
+    globalDiscount: 5, total: (6 * 7200 + 24 * 1000) * 0.95,
+    notes: "Validité 30 jours.", status: "Accepté",
+  },
+  {
+    id: "q3", number: "DEV-0003", date: addDays(-2), validity: addDays(28),
+    clientId: null, clientName: "Restaurant Le Baoulé",
+    lines: [
+      { productId: "p10", name: "Sardines à l'huile 125g", qty: 50, unitPrice: 650, discount: 10 },
+    ],
+    globalDiscount: 0, total: 50 * 650 * 0.9,
+    notes: "Paiement à 15 jours.", status: "Brouillon",
+  },
+];
+
+/* ===== Employés ===== */
+export const SEED_EMPLOYEES: Employee[] = [
+  { id: "em1", name: "KOFFI Emmanuel", position: "Gérant", phone: "+22507100001", baseSalary: 150000, hireDate: addDays(-720), idNumber: "CI001-2019", active: true },
+  { id: "em2", name: "Adjoua Marie", position: "Caissier", phone: "+22507100002", baseSalary: 85000, hireDate: addDays(-540), idNumber: "CI002-2020", active: true },
+  { id: "em3", name: "Koné Ibrahim", position: "Magasinier", phone: "+22507100003", baseSalary: 75000, hireDate: addDays(-400), active: true },
+  { id: "em4", name: "Ouédraogo Paul", position: "Livreur", phone: "+22507100004", baseSalary: 65000, hireDate: addDays(-280), active: true },
+  { id: "em5", name: "Diabaté Fatou", position: "Vendeur", phone: "+22507100005", baseSalary: 70000, hireDate: addDays(-160), active: true },
+];
+
+const monthKey = (d: Date) => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
+const curKey = monthKey(today);
+const prevDate = new Date(today); prevDate.setMonth(prevDate.getMonth() - 1);
+const prevKey = monthKey(prevDate);
+
+export const SEED_ADVANCES: SalaryAdvance[] = [
+  { id: "av1", employeeId: "em2", amount: 20000, date: addDays(-10), reason: "Frais médicaux", monthKey: curKey },
+  { id: "av2", employeeId: "em4", amount: 15000, date: addDays(-5), reason: "Avance carburant", monthKey: curKey },
+];
+
+export const SEED_SALARY_PAYMENTS: SalaryPayment[] = SEED_EMPLOYEES.map((e) => ({
+  id: "sal-prev-" + e.id,
+  employeeId: e.id,
+  employeeName: e.name,
+  monthKey: prevKey,
+  base: e.baseSalary,
+  advances: 0,
+  bonus: 0,
+  net: e.baseSalary,
+  paid: true,
+  paidAt: addDays(-5),
+  method: "Mobile Money",
+}));

@@ -45,6 +45,10 @@ function ParamsPage() {
           <Field label="Email"><input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="input" /></Field>
           <Field label="RCCM"><input value={form.rccm} onChange={(e) => setForm({ ...form, rccm: e.target.value })} className="input" /></Field>
           <Field label="Compte contribuable"><input value={form.cc} onChange={(e) => setForm({ ...form, cc: e.target.value })} className="input" /></Field>
+          <Field label="Objectif mensuel CA (FCFA)">
+            <input type="number" value={form.monthlyGoal || 0}
+              onChange={(e) => setForm({ ...form, monthlyGoal: +e.target.value })} className="input" />
+          </Field>
         </div>
         <div className="flex justify-end">
           <button onClick={save} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold">
