@@ -1,11 +1,15 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import type { Product, Client, Supplier, Sale, StockEntry, Transfer, CompanyInfo } from "./types";
+import type {
+  Product, Client, Supplier, Sale, StockEntry, Transfer, CompanyInfo,
+  Expense, DailyClosing, SupplierDebt, Quote, Employee, SalaryAdvance, SalaryPayment,
+} from "./types";
 import {
   SEED_PRODUCTS, SEED_CLIENTS, SEED_SUPPLIERS, SEED_ENTRIES, SEED_TRANSFERS,
-  COMPANY, generateSeedSales,
+  COMPANY, generateSeedSales, generateSeedExpenses, SEED_SUPPLIER_DEBTS,
+  SEED_QUOTES, SEED_EMPLOYEES, SEED_ADVANCES, SEED_SALARY_PAYMENTS,
 } from "./seed";
 
-const KEY = "koffi-data-v1";
+const KEY = "koffi-data-v2";
 
 interface DataState {
   products: Product[];
@@ -15,6 +19,13 @@ interface DataState {
   entries: StockEntry[];
   transfers: Transfer[];
   company: CompanyInfo;
+  expenses: Expense[];
+  closings: DailyClosing[];
+  supplierDebts: SupplierDebt[];
+  quotes: Quote[];
+  employees: Employee[];
+  advances: SalaryAdvance[];
+  salaryPayments: SalaryPayment[];
 }
 
 interface DataContextValue extends DataState {
@@ -25,24 +36,21 @@ interface DataContextValue extends DataState {
   setEntries: (e: StockEntry[]) => void;
   setTransfers: (t: Transfer[]) => void;
   setCompany: (c: CompanyInfo) => void;
+  setExpenses: (e: Expense[]) => void;
+  setClosings: (c: DailyClosing[]) => void;
+  setSupplierDebts: (d: SupplierDebt[]) => void;
+  setQuotes: (q: Quote[]) => void;
+  setEmployees: (e: Employee[]) => void;
+  setAdvances: (a: SalaryAdvance[]) => void;
+  setSalaryPayments: (s: SalaryPayment[]) => void;
   resetAll: () => void;
   exportJSON: () => string;
 }
 
 const DataContext = createContext<DataContextValue | null>(null);
 
-function loadInitial(): DataState {
-  if (typeof window === "undefined") {
-    return {
-      products: SEED_PRODUCTS, clients: SEED_CLIENTS, suppliers: SEED_SUPPLIERS,
-      sales: [], entries: SEED_ENTRIES, transfers: SEED_TRANSFERS, company: COMPANY,
-    };
-  }
-  try {
-    const raw = localStorage.getItem(KEY);
-    if (raw) return JSON.parse(raw);
-  } catch {}
-  const fresh: DataState = {
+function freshState(): DataState {
+  return {
     products: SEED_PRODUCTS,
     clients: SEED_CLIENTS,
     suppliers: SEED_SUPPLIERS,
@@ -50,16 +58,42 @@ function loadInitial(): DataState {
     entries: SEED_ENTRIES,
     transfers: SEED_TRANSFERS,
     company: COMPANY,
+    expenses: generateSeedExpenses(),
+    closings: [],
+    supplierDebts: SEED_SUPPLIER_DEBTS,
+    quotes: SEED_QUOTES,
+    employees: SEED_EMPLOYEES,
+    advances: SEED_ADVANCES,
+    salaryPayments: SEED_SALARY_PAYMENTS,
   };
-  localStorage.setItem(KEY, JSON.stringify(fresh));
+}
+
+function emptyState(): DataState {
+  return {
+    products: SEED_PRODUCTS, clients: SEED_CLIENTS, suppliers: SEED_SUPPLIERS,
+    sales: [], entries: SEED_ENTRIES, transfers: SEED_TRANSFERS, company: COMPANY,
+    expenses: [], closings: [], supplierDebts: [], quotes: [],
+    employees: [], advances: [], salaryPayments: [],
+  };
+}
+
+function loadInitial(): DataState {
+  if (typeof window === "undefined") return emptyState();
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      // merge defaults pour les nouvelles clés
+      return { ...freshState(), ...parsed };
+    }
+  } catch {}
+  const fresh = freshState();
+  try { localStorage.setItem(KEY, JSON.stringify(fresh)); } catch {}
   return fresh;
 }
 
 export function DataProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<DataState>(() => ({
-    products: SEED_PRODUCTS, clients: SEED_CLIENTS, suppliers: SEED_SUPPLIERS,
-    sales: [], entries: SEED_ENTRIES, transfers: SEED_TRANSFERS, company: COMPANY,
-  }));
+  const [state, setState] = useState<DataState>(() => emptyState());
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
@@ -81,6 +115,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setEntries: (entries) => setState((s) => ({ ...s, entries })),
     setTransfers: (transfers) => setState((s) => ({ ...s, transfers })),
     setCompany: (company) => setState((s) => ({ ...s, company })),
+    setExpenses: (expenses) => setState((s) => ({ ...s, expenses })),
+    setClosings: (closings) => setState((s) => ({ ...s, closings })),
+    setSupplierDebts: (supplierDebts) => setState((s) => ({ ...s, supplierDebts })),
+    setQuotes: (quotes) => setState((s) => ({ ...s, quotes })),
+    setEmployees: (employees) => setState((s) => ({ ...s, employees })),
+    setAdvances: (advances) => setState((s) => ({ ...s, advances })),
+    setSalaryPayments: (salaryPayments) => setState((s) => ({ ...s, salaryPayments })),
     resetAll: () => {
       try { localStorage.removeItem(KEY); } catch {}
       setState(loadInitial());
