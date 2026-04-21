@@ -2,8 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ProtectedLayout } from "@/components/ProtectedLayout";
 import { useData } from "@/lib/store";
 import { fcfa, formatDate } from "@/lib/format";
-import { useMemo, useState } from "react";
-import { Plus, X, Printer, ChevronLeft, ChevronRight, CheckCircle2, Wallet, CalendarDays, Trash2 } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+import { Plus, X, Printer, ChevronLeft, ChevronRight, CheckCircle2, Wallet, CalendarDays, Trash2, Download } from "lucide-react";
 import { toast } from "sonner";
 import type { Employee, EmployeePosition, SalaryAdvance, SalaryPayment, Leave, LeaveType, LeaveStatus } from "@/lib/types";
 import { UNPAID_LEAVE_TYPES } from "@/lib/types";
@@ -387,9 +387,49 @@ function SalairesTab() {
 }
 
 function Bulletin({ row, company, monthLabel, onClose }: any) {
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const [exporting, setExporting] = useState(false);
+
+  const safeName = (row.employee.name as string).replace(/\s+/g, "_");
+  const safeMonth = (monthLabel as string).replace(/\s+/g, "_");
+  const fileName = `Bulletin_${safeName}_${safeMonth}.pdf`;
+
+  const handleExportPDF = async () => {
+    if (!sheetRef.current || exporting) return;
+    try {
+      setExporting(true);
+      const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
+        import("html2canvas"),
+        import("jspdf"),
+      ]);
+      const canvas = await html2canvas(sheetRef.current, {
+        scale: 2,
+        backgroundColor: "#ffffff",
+        useCORS: true,
+      });
+      const imgData = canvas.toDataURL("image/png");
+      // A5 portrait = 148 × 210 mm
+      const pdf = new jsPDF({ unit: "mm", format: "a5", orientation: "portrait" });
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const margin = 8;
+      const availW = pageW - margin * 2;
+      const imgH = (canvas.height * availW) / canvas.width;
+      const finalH = Math.min(imgH, pageH - margin * 2);
+      pdf.addImage(imgData, "PNG", margin, margin, availW, finalH);
+      pdf.save(fileName);
+      toast.success("Bulletin exporté en PDF");
+    } catch (err) {
+      console.error(err);
+      toast.error("Échec de l'export PDF");
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-black/60 grid place-items-center p-4 overflow-y-auto print:bg-white print:p-0 print:block">
-      <div className="bg-white text-black rounded-xl w-full max-w-md p-6 my-8 print:shadow-none print:rounded-none">
+      <div className="bg-white text-black rounded-xl w-full max-w-md p-6 my-8 print:shadow-none print:rounded-none" ref={sheetRef}>
         <div className="flex items-center justify-between mb-4">
           <div>
             <div className="font-bold">{company.name}</div>
@@ -438,13 +478,17 @@ function Bulletin({ row, company, monthLabel, onClose }: any) {
         <div className="text-center text-[10px] text-gray-500 border-t border-gray-200 pt-2 mt-4">
           GESTEK — Gérez mieux. Vendez plus.
         </div>
+      </div>
 
-        <div className="flex justify-end gap-2 mt-4 print:hidden">
-          <button onClick={onClose} className="px-3 py-2 rounded-lg border border-gray-300 text-sm">Fermer</button>
-          <button onClick={() => window.print()} className="px-3 py-2 rounded-lg bg-[#1B5E20] text-white text-sm font-semibold flex items-center gap-2">
-            <Printer className="h-4 w-4" /> Imprimer
-          </button>
-        </div>
+      <div className="fixed bottom-4 left-0 right-0 flex justify-center gap-2 print:hidden">
+        <button onClick={onClose} className="px-3 py-2 rounded-lg bg-white border border-gray-300 text-sm shadow">Fermer</button>
+        <button onClick={() => window.print()} className="px-3 py-2 rounded-lg bg-[#1B5E20] text-white text-sm font-semibold flex items-center gap-2 shadow">
+          <Printer className="h-4 w-4" /> Imprimer
+        </button>
+        <button onClick={handleExportPDF} disabled={exporting}
+          className="px-3 py-2 rounded-lg bg-[#F9A825] text-black text-sm font-semibold flex items-center gap-2 shadow disabled:opacity-60">
+          <Download className="h-4 w-4" /> {exporting ? "Export…" : "Exporter PDF"}
+        </button>
       </div>
     </div>
   );
