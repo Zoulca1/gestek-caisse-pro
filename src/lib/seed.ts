@@ -1,6 +1,6 @@
 import type {
   Product, Client, Supplier, Sale, SaleItem, StockEntry, Transfer, Store, CompanyInfo,
-  Expense, SupplierDebt, Quote, Employee, SalaryAdvance, SalaryPayment,
+  Expense, SupplierDebt, Quote, Employee, SalaryAdvance, SalaryPayment, Leave,
 } from "./types";
 
 export const STORES: Store[] = [
@@ -216,8 +216,45 @@ export const SEED_SALARY_PAYMENTS: SalaryPayment[] = SEED_EMPLOYEES.map((e) => (
   base: e.baseSalary,
   advances: 0,
   bonus: 0,
+  deduction: 0,
+  unpaidDays: 0,
   net: e.baseSalary,
   paid: true,
   paidAt: addDays(-5),
   method: "Mobile Money",
 }));
+
+/* ===== Congés & absences ===== */
+const isoDay = (d: Date) => d.toISOString().slice(0, 10);
+const mkDate = (offset: number) => {
+  const d = new Date(today);
+  d.setDate(d.getDate() + offset);
+  return isoDay(d);
+};
+const diffDays = (a: string, b: string) =>
+  Math.round((new Date(b).getTime() - new Date(a).getTime()) / 86400000) + 1;
+
+const leaveEntries: Array<Omit<Leave, "id" | "days" | "createdAt" | "employeeName">> = [
+  // Congé payé à venir pour le gérant
+  { employeeId: "em1", type: "Congé payé", startDate: mkDate(10), endDate: mkDate(14), reason: "Congé annuel", status: "Approuvé" },
+  // Maladie récente — caissière (pas de déduction)
+  { employeeId: "em2", type: "Maladie", startDate: mkDate(-6), endDate: mkDate(-4), reason: "Arrêt maladie — certificat médical", status: "Approuvé" },
+  // Absence non justifiée — livreur (IMPACT SALAIRE)
+  { employeeId: "em4", type: "Absence non justifiée", startDate: mkDate(-3), endDate: mkDate(-3), reason: "Absence non signalée", status: "Approuvé" },
+  // Congé sans solde demandé — magasinier (IMPACT SALAIRE)
+  { employeeId: "em3", type: "Congé sans solde", startDate: mkDate(5), endDate: mkDate(7), reason: "Affaires familiales", status: "En attente" },
+  // Récupération — vendeuse
+  { employeeId: "em5", type: "Récupération", startDate: mkDate(-1), endDate: mkDate(-1), reason: "Récup heures supp dimanche", status: "Approuvé" },
+];
+
+export const SEED_LEAVES: Leave[] = leaveEntries.map((l, i) => {
+  const emp = SEED_EMPLOYEES.find((e) => e.id === l.employeeId)!;
+  return {
+    id: "lv" + (i + 1),
+    employeeName: emp.name,
+    days: diffDays(l.startDate, l.endDate),
+    createdAt: addDays(-8 + i),
+    ...l,
+  };
+});
+

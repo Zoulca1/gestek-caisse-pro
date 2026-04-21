@@ -9,7 +9,7 @@ import {
   SEED_QUOTES, SEED_EMPLOYEES, SEED_ADVANCES, SEED_SALARY_PAYMENTS, SEED_LEAVES,
 } from "./seed";
 
-const KEY = "koffi-data-v2";
+const KEY = "koffi-data-v3";
 
 interface DataState {
   products: Product[];
