@@ -95,6 +95,8 @@ export interface CompanyInfo {
   rccm: string;
   cc: string;
   monthlyGoal?: number;
+  /** Mentions légales affichées au pied du bulletin de salaire (multilignes) */
+  payslipFooter?: string;
 }
 
 /* ============== Comptabilité ============== */

@@ -49,6 +49,17 @@ function ParamsPage() {
             <input type="number" value={form.monthlyGoal || 0}
               onChange={(e) => setForm({ ...form, monthlyGoal: +e.target.value })} className="input" />
           </Field>
+          <div className="sm:col-span-2">
+            <Field label="Mentions légales du bulletin de salaire">
+              <textarea rows={4} value={form.payslipFooter || ""}
+                onChange={(e) => setForm({ ...form, payslipFooter: e.target.value })}
+                placeholder="Texte affiché au pied de chaque bulletin imprimé / exporté en PDF…"
+                className="input font-mono" />
+            </Field>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Ces lignes apparaissent sur le bulletin, avec la période, le nom de l'entreprise, l'adresse, le RCCM et le CC.
+            </p>
+          </div>
         </div>
         <div className="flex justify-end">
           <button onClick={save} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold">

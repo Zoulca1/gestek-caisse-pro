@@ -17,6 +17,7 @@ export const COMPANY: CompanyInfo = {
   rccm: "CI-ABJ-2019-B-12345",
   cc: "CC-1903456 P",
   monthlyGoal: 3500000,
+  payslipFooter: "Bulletin édité conformément au Code du Travail de Côte d'Ivoire.\nÀ conserver sans limitation de durée.\nEn cas de réclamation, contacter la direction dans un délai de 30 jours.",
 };
 
 const today = new Date();
