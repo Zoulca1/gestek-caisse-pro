@@ -519,3 +519,334 @@ function HistoriqueTab() {
     </>
   );
 }
+
+/* ====================== Onglet Congés & absences ====================== */
+
+const LEAVE_COLORS: Record<LeaveType, string> = {
+  "Congé payé": "bg-primary/70",
+  "Congé sans solde": "bg-destructive/70",
+  "Maladie": "bg-sky-500/70",
+  "Maternité": "bg-pink-500/70",
+  "Absence non justifiée": "bg-destructive/90",
+  "Récupération": "bg-amber-500/70",
+};
+
+const STATUS_BADGE: Record<LeaveStatus, string> = {
+  "En attente": "bg-warning/20 text-warning-foreground",
+  "Approuvé": "bg-success/15 text-success",
+  "Refusé": "bg-destructive/15 text-destructive",
+};
+
+function toISO(d: Date) { return d.toISOString().slice(0, 10); }
+function parseISO(s: string) { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); }
+function sameDay(a: Date, b: Date) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+function inRange(day: Date, start: string, end: string) {
+  const s = parseISO(start); const e = parseISO(end);
+  const t = new Date(day.getFullYear(), day.getMonth(), day.getDate()).getTime();
+  return t >= s.getTime() && t <= e.getTime();
+}
+
+function CongesTab() {
+  const { employees, leaves, setLeaves } = useData();
+  const [cursor, setCursor] = useState(new Date());
+  const [modal, setModal] = useState<Leave | null>(null);
+  const [filterEmp, setFilterEmp] = useState<string>("");
+
+  const label = cursor.toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
+  const year = cursor.getFullYear();
+  const month = cursor.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDow = (new Date(year, month, 1).getDay() + 6) % 7; // lundi=0
+  const key = monthKey(cursor);
+
+  const monthLeaves = useMemo(() => {
+    return leaves.filter((l) => {
+      if (filterEmp && l.employeeId !== filterEmp) return false;
+      const s = parseISO(l.startDate); const e = parseISO(l.endDate);
+      const monthStart = new Date(year, month, 1);
+      const monthEnd = new Date(year, month + 1, 0);
+      return e >= monthStart && s <= monthEnd;
+    });
+  }, [leaves, year, month, filterEmp]);
+
+  const stats = useMemo(() => {
+    const map: Record<string, number> = {};
+    let unpaid = 0;
+    for (const l of monthLeaves) {
+      if (l.status !== "Approuvé") continue;
+      // jours qui tombent dans le mois courant
+      let n = 0;
+      const s = parseISO(l.startDate); const e = parseISO(l.endDate);
+      const cur = new Date(s);
+      while (cur <= e) {
+        if (cur.getMonth() === month && cur.getFullYear() === year) n++;
+        cur.setDate(cur.getDate() + 1);
+      }
+      map[l.type] = (map[l.type] || 0) + n;
+      if (UNPAID_LEAVE_TYPES.includes(l.type)) unpaid += n;
+    }
+    return { map, unpaid };
+  }, [monthLeaves, month, year]);
+
+  const openNew = () => setModal({
+    id: "lv-" + Date.now(),
+    employeeId: employees[0]?.id || "",
+    employeeName: employees[0]?.name || "",
+    type: "Congé payé",
+    startDate: toISO(new Date()),
+    endDate: toISO(new Date()),
+    days: 1,
+    reason: "",
+    status: "En attente",
+    createdAt: new Date().toISOString(),
+  });
+
+  const saveLeave = () => {
+    if (!modal) return;
+    const emp = employees.find((e) => e.id === modal.employeeId);
+    if (!emp) { toast.error("Employé requis"); return; }
+    if (!modal.startDate || !modal.endDate) { toast.error("Dates requises"); return; }
+    if (modal.endDate < modal.startDate) { toast.error("Dates invalides"); return; }
+    const days = Math.round((parseISO(modal.endDate).getTime() - parseISO(modal.startDate).getTime()) / 86400000) + 1;
+    const payload: Leave = { ...modal, employeeName: emp.name, days };
+    const exists = leaves.find((l) => l.id === modal.id);
+    setLeaves(exists ? leaves.map((l) => l.id === modal.id ? payload : l) : [payload, ...leaves]);
+    setModal(null);
+    toast.success("Absence enregistrée");
+  };
+
+  const updateStatus = (id: string, status: LeaveStatus) => {
+    setLeaves(leaves.map((l) => l.id === id ? { ...l, status } : l));
+    toast.success(status === "Approuvé" ? "Demande approuvée" : status === "Refusé" ? "Demande refusée" : "Mise à jour");
+  };
+
+  const removeLeave = (id: string) => {
+    if (!confirm("Supprimer cette absence ?")) return;
+    setLeaves(leaves.filter((l) => l.id !== id));
+    toast.success("Absence supprimée");
+  };
+
+  // Grille du calendrier
+  const cells: Array<{ day: number | null; date: Date | null }> = [];
+  for (let i = 0; i < firstDow; i++) cells.push({ day: null, date: null });
+  for (let d = 1; d <= daysInMonth; d++) cells.push({ day: d, date: new Date(year, month, d) });
+  while (cells.length % 7 !== 0) cells.push({ day: null, date: null });
+
+  const today = new Date();
+
+  return (
+    <div className="space-y-4">
+      {/* Header : navigation mois + bouton */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <button onClick={() => setCursor(new Date(year, month - 1, 1))}
+            className="p-2 rounded-lg border border-border hover:bg-muted"><ChevronLeft className="h-4 w-4" /></button>
+          <div className="font-display font-bold text-lg capitalize px-3">{label}</div>
+          <button onClick={() => setCursor(new Date(year, month + 1, 1))}
+            className="p-2 rounded-lg border border-border hover:bg-muted"><ChevronRight className="h-4 w-4" /></button>
+        </div>
+        <div className="flex items-center gap-2">
+          <select value={filterEmp} onChange={(e) => setFilterEmp(e.target.value)}
+            className="px-3 py-1.5 rounded-lg border border-input bg-background text-sm">
+            <option value="">Tous les employés</option>
+            {employees.map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}
+          </select>
+          <button onClick={openNew} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold">
+            <Plus className="h-4 w-4" /> Nouvelle absence
+          </button>
+        </div>
+      </div>
+
+      {/* Stats du mois */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <StatCard title="Total jours" value={String(Object.values(stats.map).reduce((a, b) => a + b, 0))} />
+        <StatCard title="Congés payés" value={String(stats.map["Congé payé"] || 0)} tone="primary" />
+        <StatCard title="Maladie" value={String(stats.map["Maladie"] || 0)} tone="info" />
+        <StatCard title="Jours non payés" value={String(stats.unpaid)} tone="destructive" />
+      </div>
+
+      {/* Calendrier mensuel */}
+      <div className="rounded-xl bg-card border border-border p-3">
+        <div className="grid grid-cols-7 gap-1 mb-1 text-[10px] uppercase font-bold text-muted-foreground text-center">
+          {["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"].map((d) => <div key={d} className="py-1">{d}</div>)}
+        </div>
+        <div className="grid grid-cols-7 gap-1">
+          {cells.map((c, i) => {
+            if (!c.date) return <div key={i} className="aspect-square sm:aspect-[4/3] rounded-md bg-muted/20" />;
+            const dayLeaves = monthLeaves.filter((l) => inRange(c.date!, l.startDate, l.endDate) && l.status !== "Refusé");
+            const isToday = sameDay(c.date, today);
+            return (
+              <div key={i}
+                className={`aspect-square sm:aspect-[4/3] rounded-md border p-1 text-xs overflow-hidden flex flex-col ${
+                  isToday ? "border-gold bg-gold/5" : "border-border bg-background"
+                }`}>
+                <div className={`text-[10px] font-bold ${isToday ? "text-gold" : "text-muted-foreground"}`}>{c.day}</div>
+                <div className="mt-0.5 flex-1 flex flex-col gap-0.5 overflow-hidden">
+                  {dayLeaves.slice(0, 3).map((l) => (
+                    <button key={l.id} onClick={() => setModal(l)}
+                      title={`${l.employeeName} · ${l.type}`}
+                      className={`truncate text-left text-[9px] sm:text-[10px] px-1 py-0.5 rounded text-white ${LEAVE_COLORS[l.type]} ${l.status === "En attente" ? "opacity-60" : ""}`}>
+                      {l.employeeName.split(" ")[0]}
+                    </button>
+                  ))}
+                  {dayLeaves.length > 3 && (
+                    <div className="text-[9px] text-muted-foreground">+{dayLeaves.length - 3}</div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        {/* Légende */}
+        <div className="flex flex-wrap gap-3 mt-3 pt-3 border-t border-border text-[11px]">
+          {LEAVE_TYPES.map((t) => (
+            <div key={t} className="flex items-center gap-1.5">
+              <span className={`inline-block h-3 w-3 rounded ${LEAVE_COLORS[t]}`} />
+              <span className="text-muted-foreground">{t}</span>
+            </div>
+          ))}
+          <div className="flex items-center gap-1.5 ml-auto">
+            <CalendarDays className="h-3 w-3 text-gold" />
+            <span className="text-muted-foreground">Impact salaire : congé sans solde + absence non justifiée</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Tableau des absences du mois */}
+      <div className="rounded-xl bg-card border border-border overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead className="bg-muted/40 text-xs uppercase text-muted-foreground">
+            <tr className="text-left">
+              <th className="px-3 py-2.5">Employé</th>
+              <th className="px-3 py-2.5">Type</th>
+              <th className="px-3 py-2.5">Période</th>
+              <th className="px-3 py-2.5 text-right">Jours</th>
+              <th className="px-3 py-2.5">Motif</th>
+              <th className="px-3 py-2.5">Statut</th>
+              <th className="px-3 py-2.5 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {monthLeaves.length === 0 && (
+              <tr><td colSpan={7} className="px-3 py-6 text-center text-muted-foreground">Aucune absence ce mois-ci</td></tr>
+            )}
+            {monthLeaves.map((l) => (
+              <tr key={l.id} className="border-t border-border">
+                <td className="px-3 py-2.5 font-medium">{l.employeeName}</td>
+                <td className="px-3 py-2.5">
+                  <span className={`text-xs px-2 py-0.5 rounded text-white ${LEAVE_COLORS[l.type]}`}>{l.type}</span>
+                </td>
+                <td className="px-3 py-2.5 text-xs">
+                  {formatDate(l.startDate)} → {formatDate(l.endDate)}
+                </td>
+                <td className="px-3 py-2.5 text-right tabular-nums font-semibold">
+                  {l.days}
+                  {UNPAID_LEAVE_TYPES.includes(l.type) && l.status === "Approuvé" && (
+                    <div className="text-[10px] text-destructive">impact paie</div>
+                  )}
+                </td>
+                <td className="px-3 py-2.5 text-xs text-muted-foreground max-w-[200px] truncate">{l.reason || "—"}</td>
+                <td className="px-3 py-2.5">
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${STATUS_BADGE[l.status]}`}>{l.status}</span>
+                </td>
+                <td className="px-3 py-2.5 text-right">
+                  <div className="flex gap-1 justify-end">
+                    {l.status === "En attente" && (
+                      <>
+                        <button onClick={() => updateStatus(l.id, "Approuvé")}
+                          className="text-xs px-2 py-1 rounded bg-success/15 text-success hover:bg-success/25">Approuver</button>
+                        <button onClick={() => updateStatus(l.id, "Refusé")}
+                          className="text-xs px-2 py-1 rounded bg-destructive/15 text-destructive hover:bg-destructive/25">Refuser</button>
+                      </>
+                    )}
+                    <button onClick={() => setModal(l)} className="text-xs px-2 py-1 rounded border border-border hover:bg-muted">Modifier</button>
+                    <button onClick={() => removeLeave(l.id)} className="text-xs p-1 rounded border border-border hover:bg-destructive/10 text-destructive" title="Supprimer">
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Modal édition */}
+      {modal && (
+        <div className="fixed inset-0 z-50 bg-black/50 grid place-items-center p-4">
+          <div className="bg-card rounded-xl w-full max-w-lg p-5 border border-border">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display font-bold">Absence / congé</h3>
+              <button onClick={() => setModal(null)}><X className="h-5 w-5" /></button>
+            </div>
+            <div className="grid sm:grid-cols-2 gap-3">
+              <Field label="Employé">
+                <select value={modal.employeeId}
+                  onChange={(e) => setModal({ ...modal, employeeId: e.target.value })} className="input">
+                  {employees.map((emp) => <option key={emp.id} value={emp.id}>{emp.name}</option>)}
+                </select>
+              </Field>
+              <Field label="Type">
+                <select value={modal.type}
+                  onChange={(e) => setModal({ ...modal, type: e.target.value as LeaveType })} className="input">
+                  {LEAVE_TYPES.map((t) => <option key={t}>{t}</option>)}
+                </select>
+              </Field>
+              <Field label="Date début">
+                <input type="date" value={modal.startDate}
+                  onChange={(e) => setModal({ ...modal, startDate: e.target.value })} className="input" />
+              </Field>
+              <Field label="Date fin">
+                <input type="date" value={modal.endDate}
+                  onChange={(e) => setModal({ ...modal, endDate: e.target.value })} className="input" />
+              </Field>
+              <Field label="Statut">
+                <select value={modal.status}
+                  onChange={(e) => setModal({ ...modal, status: e.target.value as LeaveStatus })} className="input">
+                  <option>En attente</option><option>Approuvé</option><option>Refusé</option>
+                </select>
+              </Field>
+              <div className="sm:col-span-2">
+                <Field label="Motif / description">
+                  <textarea value={modal.reason} rows={2}
+                    onChange={(e) => setModal({ ...modal, reason: e.target.value })} className="input" />
+                </Field>
+              </div>
+            </div>
+
+            {UNPAID_LEAVE_TYPES.includes(modal.type) && (
+              <div className="mt-3 p-2.5 rounded-lg bg-destructive/10 border border-destructive/30 text-xs text-destructive">
+                ⚠ Ce type d'absence est <strong>non payé</strong> et sera déduit automatiquement du salaire du mois concerné (base ÷ {WORKING_DAYS_PER_MONTH} × jours).
+              </div>
+            )}
+
+            <div className="flex justify-end gap-2 mt-4">
+              <button onClick={() => setModal(null)} className="px-3 py-2 rounded-lg border border-border text-sm">Annuler</button>
+              <button onClick={saveLeave} className="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4" /> Enregistrer
+              </button>
+            </div>
+            <style>{`.input{width:100%;padding:.5rem .75rem;border-radius:.5rem;border:1px solid var(--color-input);background:var(--color-background);font-size:.875rem}`}</style>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function StatCard({ title, value, tone }: { title: string; value: string; tone?: "primary" | "destructive" | "info" }) {
+  const toneClass =
+    tone === "primary" ? "text-primary" :
+    tone === "destructive" ? "text-destructive" :
+    tone === "info" ? "text-sky-500" :
+    "text-gold";
+  return (
+    <div className="p-4 rounded-xl bg-card border border-border">
+      <div className="text-xs uppercase text-muted-foreground font-semibold">{title}</div>
+      <div className={`font-display font-bold text-2xl tabular-nums mt-1 ${toneClass}`}>{value}</div>
+    </div>
+  );
+}
+
