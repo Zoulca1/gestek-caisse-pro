@@ -414,6 +414,14 @@ function Bulletin({ row, company, monthLabel, onClose }: any) {
                 {row.advances.map((a: any) => `${formatDate(a.date)} : ${fcfa(a.amount)} (${a.reason})`).join(" · ")}
               </td></tr>
             )}
+            {row.unpaidDays > 0 && (
+              <tr className="border-b">
+                <td className="py-1.5">Déduction absences
+                  <div className="text-xs text-gray-500">{row.unpaidDays} jour{row.unpaidDays > 1 ? "s" : ""} non payé{row.unpaidDays > 1 ? "s" : ""}</div>
+                </td>
+                <td className="text-right tabular-nums text-red-600">- {fcfa(row.deduction)}</td>
+              </tr>
+            )}
             <tr className="border-b"><td className="py-1.5">Bonus / prime</td><td className="text-right tabular-nums text-green-600">+ {fcfa(row.bonus)}</td></tr>
             <tr className="bg-yellow-50 border-2 border-[#F9A825]">
               <td className="py-2 px-2 font-bold">NET À PAYER</td>
