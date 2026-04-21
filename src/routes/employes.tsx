@@ -177,7 +177,7 @@ function Field({ label, children }: any) {
 }
 
 function SalairesTab() {
-  const { employees, advances, setAdvances, salaryPayments, setSalaryPayments, company } = useData();
+  const { employees, advances, setAdvances, salaryPayments, setSalaryPayments, leaves, company } = useData();
   const [cursor, setCursor] = useState(new Date());
   const key = monthKey(cursor);
   const label = cursor.toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
@@ -195,10 +195,14 @@ function SalairesTab() {
       const advTotal = advs.reduce((s, a) => s + a.amount, 0);
       const existingPay = salaryPayments.find((p) => p.employeeId === e.id && p.monthKey === key);
       const bonus = existingPay?.bonus ?? bonusEdit[e.id] ?? 0;
-      const net = e.baseSalary - advTotal + bonus;
-      return { employee: e, advances: advs, advTotal, bonus, net, payment: existingPay };
+      // Jours d'absence non payés du mois → déduction au prorata (base / 26)
+      const unpaidDays = existingPay?.unpaidDays ?? countUnpaidDays(leaves, e.id, key);
+      const dailyRate = e.baseSalary / WORKING_DAYS_PER_MONTH;
+      const deduction = existingPay?.deduction ?? Math.round(dailyRate * unpaidDays);
+      const net = e.baseSalary - advTotal - deduction + bonus;
+      return { employee: e, advances: advs, advTotal, bonus, unpaidDays, deduction, net, payment: existingPay };
     });
-  }, [employees, advances, salaryPayments, key, bonusEdit]);
+  }, [employees, advances, salaryPayments, leaves, key, bonusEdit]);
 
   const submitAdvance = () => {
     if (!advModal) return;
@@ -226,6 +230,8 @@ function SalairesTab() {
       base: row.employee.baseSalary,
       advances: row.advTotal,
       bonus: row.bonus,
+      deduction: row.deduction,
+      unpaidDays: row.unpaidDays,
       net: row.net,
       paid: true,
       paidAt: new Date().toISOString(),
@@ -242,7 +248,8 @@ function SalairesTab() {
     const newPayments = rows.filter((r) => !r.payment?.paid).map((r) => ({
       id: "sal-" + key + "-" + r.employee.id,
       employeeId: r.employee.id, employeeName: r.employee.name, monthKey: key,
-      base: r.employee.baseSalary, advances: r.advTotal, bonus: r.bonus, net: r.net,
+      base: r.employee.baseSalary, advances: r.advTotal, bonus: r.bonus,
+      deduction: r.deduction, unpaidDays: r.unpaidDays, net: r.net,
       paid: true, paidAt: now, method: "Mobile Money" as const,
     }));
     const others = salaryPayments.filter((p) => p.monthKey !== key || rows.find((r) => r.employee.id === p.employeeId)?.payment?.paid);
@@ -271,6 +278,7 @@ function SalairesTab() {
             <tr className="text-left">
               <th className="px-3 py-2.5">Employé</th>
               <th className="px-3 py-2.5 text-right">Salaire base</th>
+              <th className="px-3 py-2.5 text-right">Absences</th>
               <th className="px-3 py-2.5 text-right">Avances</th>
               <th className="px-3 py-2.5 text-right">Bonus</th>
               <th className="px-3 py-2.5 text-right">Net à payer</th>
@@ -283,6 +291,16 @@ function SalairesTab() {
               <tr key={r.employee.id} className="border-t border-border">
                 <td className="px-3 py-2.5 font-medium">{r.employee.name}<div className="text-xs text-muted-foreground">{r.employee.position}</div></td>
                 <td className="px-3 py-2.5 text-right tabular-nums">{fcfa(r.employee.baseSalary)}</td>
+                <td className="px-3 py-2.5 text-right">
+                  {r.unpaidDays > 0 ? (
+                    <div className="tabular-nums text-destructive">
+                      <div className="font-semibold">- {fcfa(r.deduction)}</div>
+                      <div className="text-[10px] text-muted-foreground">{r.unpaidDays} j non payé{r.unpaidDays > 1 ? "s" : ""}</div>
+                    </div>
+                  ) : (
+                    <span className="text-muted-foreground text-xs">—</span>
+                  )}
+                </td>
                 <td className="px-3 py-2.5 text-right tabular-nums text-destructive">- {fcfa(r.advTotal)}</td>
                 <td className="px-3 py-2.5 text-right">
                   {r.payment?.paid ? (
