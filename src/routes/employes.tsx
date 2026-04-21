@@ -3,32 +3,56 @@ import { ProtectedLayout } from "@/components/ProtectedLayout";
 import { useData } from "@/lib/store";
 import { fcfa, formatDate } from "@/lib/format";
 import { useMemo, useState } from "react";
-import { Plus, X, Printer, ChevronLeft, ChevronRight, CheckCircle2, Wallet } from "lucide-react";
+import { Plus, X, Printer, ChevronLeft, ChevronRight, CheckCircle2, Wallet, CalendarDays, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import type { Employee, EmployeePosition, SalaryAdvance, SalaryPayment } from "@/lib/types";
+import type { Employee, EmployeePosition, SalaryAdvance, SalaryPayment, Leave, LeaveType, LeaveStatus } from "@/lib/types";
+import { UNPAID_LEAVE_TYPES } from "@/lib/types";
 
 export const Route = createFileRoute("/employes")({
   component: () => <ProtectedLayout require="admin"><EmployesPage /></ProtectedLayout>,
 });
 
 const POSITIONS: EmployeePosition[] = ["Caissier", "Vendeur", "Magasinier", "Livreur", "Comptable", "Gérant", "Autre"];
+const LEAVE_TYPES: LeaveType[] = ["Congé payé", "Congé sans solde", "Maladie", "Maternité", "Absence non justifiée", "Récupération"];
 
 const monthKey = (d: Date) => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
 
+/** Diviseur standard de paie (jours ouvrés / mois) */
+const WORKING_DAYS_PER_MONTH = 26;
+
+/** Compte les jours d'absence non payés (approuvés) d'un employé sur un mois */
+function countUnpaidDays(leaves: Leave[], employeeId: string, key: string) {
+  let total = 0;
+  for (const l of leaves) {
+    if (l.employeeId !== employeeId) continue;
+    if (l.status !== "Approuvé") continue;
+    if (!UNPAID_LEAVE_TYPES.includes(l.type)) continue;
+    const start = new Date(l.startDate);
+    const end = new Date(l.endDate);
+    const cur = new Date(start);
+    while (cur <= end) {
+      if (monthKey(cur) === key) total++;
+      cur.setDate(cur.getDate() + 1);
+    }
+  }
+  return total;
+}
+
 function EmployesPage() {
-  const [tab, setTab] = useState<"liste" | "salaires" | "historique">("liste");
+  const [tab, setTab] = useState<"liste" | "salaires" | "conges" | "historique">("liste");
 
   return (
     <div className="space-y-4">
       <div>
         <h1 className="font-display font-bold text-2xl md:text-3xl">Employés & salaires</h1>
-        <p className="text-sm text-muted-foreground">Gestion du personnel et de la masse salariale.</p>
+        <p className="text-sm text-muted-foreground">Gestion du personnel, des congés et de la masse salariale.</p>
       </div>
 
       <div className="flex gap-1 border-b border-border overflow-x-auto">
         {([
           ["liste", "Liste des employés"],
           ["salaires", "Gestion des salaires"],
+          ["conges", "Congés & absences"],
           ["historique", "Historique"],
         ] as const).map(([k, l]) => (
           <button key={k} onClick={() => setTab(k)}
@@ -42,6 +66,7 @@ function EmployesPage() {
 
       {tab === "liste" && <ListeTab />}
       {tab === "salaires" && <SalairesTab />}
+      {tab === "conges" && <CongesTab />}
       {tab === "historique" && <HistoriqueTab />}
     </div>
   );
