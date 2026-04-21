@@ -475,8 +475,30 @@ function Bulletin({ row, company, monthLabel, onClose }: any) {
           <div className="text-center"><div className="border-t border-gray-400 pt-1">Signature employé</div></div>
         </div>
 
-        <div className="text-center text-[10px] text-gray-500 border-t border-gray-200 pt-2 mt-4">
-          GESTEK — Gérez mieux. Vendez plus.
+        <div className="mt-6 pt-2 border-t border-gray-200 text-[9px] text-gray-600 leading-snug space-y-1">
+          <div className="flex justify-between gap-2">
+            <span><strong>Période :</strong> <span className="capitalize">{monthLabel}</span></span>
+            <span><strong>Édité le :</strong> {new Date().toLocaleDateString("fr-FR")}</span>
+          </div>
+          <div>
+            <strong>{company.name}</strong>
+            {company.address ? " — " + company.address : ""}
+            {company.phone ? " · Tél. " + company.phone : ""}
+            {company.email ? " · " + company.email : ""}
+          </div>
+          {(company.rccm || company.cc) && (
+            <div>
+              {company.rccm && <span>RCCM : {company.rccm}</span>}
+              {company.rccm && company.cc && <span> · </span>}
+              {company.cc && <span>CC : {company.cc}</span>}
+            </div>
+          )}
+          {company.payslipFooter && (
+            <div className="pt-1 whitespace-pre-line italic">{company.payslipFooter}</div>
+          )}
+          <div className="text-center text-[9px] text-gray-400 pt-1">
+            GESTEK — Gérez mieux. Vendez plus.
+          </div>
         </div>
       </div>
 
