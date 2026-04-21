@@ -201,8 +201,37 @@ export interface SalaryPayment {
   base: number;
   advances: number;
   bonus: number;
+  deduction?: number;
+  unpaidDays?: number;
   net: number;
   paid: boolean;
   paidAt?: string;
   method?: "Espèces" | "Mobile Money";
 }
+
+/* ============== Congés & Absences ============== */
+export type LeaveType =
+  | "Congé payé"
+  | "Congé sans solde"
+  | "Maladie"
+  | "Maternité"
+  | "Absence non justifiée"
+  | "Récupération";
+
+export type LeaveStatus = "En attente" | "Approuvé" | "Refusé";
+
+export interface Leave {
+  id: string;
+  employeeId: string;
+  employeeName: string;
+  type: LeaveType;
+  startDate: string; // ISO (date seulement)
+  endDate: string;   // ISO (date seulement, inclus)
+  days: number;
+  reason: string;
+  status: LeaveStatus;
+  createdAt: string;
+}
+
+/** Types de congés non payés — entraînent une déduction de salaire */
+export const UNPAID_LEAVE_TYPES: LeaveType[] = ["Congé sans solde", "Absence non justifiée"];

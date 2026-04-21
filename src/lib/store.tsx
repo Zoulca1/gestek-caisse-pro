@@ -1,15 +1,15 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type {
   Product, Client, Supplier, Sale, StockEntry, Transfer, CompanyInfo,
-  Expense, DailyClosing, SupplierDebt, Quote, Employee, SalaryAdvance, SalaryPayment,
+  Expense, DailyClosing, SupplierDebt, Quote, Employee, SalaryAdvance, SalaryPayment, Leave,
 } from "./types";
 import {
   SEED_PRODUCTS, SEED_CLIENTS, SEED_SUPPLIERS, SEED_ENTRIES, SEED_TRANSFERS,
   COMPANY, generateSeedSales, generateSeedExpenses, SEED_SUPPLIER_DEBTS,
-  SEED_QUOTES, SEED_EMPLOYEES, SEED_ADVANCES, SEED_SALARY_PAYMENTS,
+  SEED_QUOTES, SEED_EMPLOYEES, SEED_ADVANCES, SEED_SALARY_PAYMENTS, SEED_LEAVES,
 } from "./seed";
 
-const KEY = "koffi-data-v2";
+const KEY = "koffi-data-v3";
 
 interface DataState {
   products: Product[];
@@ -26,6 +26,7 @@ interface DataState {
   employees: Employee[];
   advances: SalaryAdvance[];
   salaryPayments: SalaryPayment[];
+  leaves: Leave[];
 }
 
 interface DataContextValue extends DataState {
@@ -43,6 +44,7 @@ interface DataContextValue extends DataState {
   setEmployees: (e: Employee[]) => void;
   setAdvances: (a: SalaryAdvance[]) => void;
   setSalaryPayments: (s: SalaryPayment[]) => void;
+  setLeaves: (l: Leave[]) => void;
   resetAll: () => void;
   exportJSON: () => string;
 }
@@ -65,6 +67,7 @@ function freshState(): DataState {
     employees: SEED_EMPLOYEES,
     advances: SEED_ADVANCES,
     salaryPayments: SEED_SALARY_PAYMENTS,
+    leaves: SEED_LEAVES,
   };
 }
 
@@ -73,7 +76,7 @@ function emptyState(): DataState {
     products: SEED_PRODUCTS, clients: SEED_CLIENTS, suppliers: SEED_SUPPLIERS,
     sales: [], entries: SEED_ENTRIES, transfers: SEED_TRANSFERS, company: COMPANY,
     expenses: [], closings: [], supplierDebts: [], quotes: [],
-    employees: [], advances: [], salaryPayments: [],
+    employees: [], advances: [], salaryPayments: [], leaves: [],
   };
 }
 
@@ -122,6 +125,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setEmployees: (employees) => setState((s) => ({ ...s, employees })),
     setAdvances: (advances) => setState((s) => ({ ...s, advances })),
     setSalaryPayments: (salaryPayments) => setState((s) => ({ ...s, salaryPayments })),
+    setLeaves: (leaves) => setState((s) => ({ ...s, leaves })),
     resetAll: () => {
       try { localStorage.removeItem(KEY); } catch {}
       setState(loadInitial());
