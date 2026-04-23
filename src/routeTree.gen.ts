@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VenteRouteImport } from './routes/vente'
 import { Route as TransfertsRouteImport } from './routes/transferts'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RapportsRouteImport } from './routes/rapports'
 import { Route as ProduitsRouteImport } from './routes/produits'
 import { Route as ParametresRouteImport } from './routes/parametres'
@@ -22,6 +23,9 @@ import { Route as DemoRouteImport } from './routes/demo'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ComptabiliteRouteImport } from './routes/comptabilite'
 import { Route as ClientsRouteImport } from './routes/clients'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AppRouteImport } from './routes/app'
+import { Route as IndexRouteImport } from './routes/index'
 
 const VenteRoute = VenteRouteImport.update({
   id: '/vente',
@@ -31,6 +35,11 @@ const VenteRoute = VenteRouteImport.update({
 const TransfertsRoute = TransfertsRouteImport.update({
   id: '/transferts',
   path: '/transferts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RapportsRoute = RapportsRouteImport.update({
@@ -88,8 +97,26 @@ const ClientsRoute = ClientsRouteImport.update({
   path: '/clients',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
+  '/app': typeof AppRoute
+  '/auth': typeof AuthRoute
   '/clients': typeof ClientsRoute
   '/comptabilite': typeof ComptabiliteRoute
   '/dashboard': typeof DashboardRoute
@@ -101,10 +128,14 @@ export interface FileRoutesByFullPath {
   '/parametres': typeof ParametresRoute
   '/produits': typeof ProduitsRoute
   '/rapports': typeof RapportsRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/transferts': typeof TransfertsRoute
   '/vente': typeof VenteRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
+  '/app': typeof AppRoute
+  '/auth': typeof AuthRoute
   '/clients': typeof ClientsRoute
   '/comptabilite': typeof ComptabiliteRoute
   '/dashboard': typeof DashboardRoute
@@ -116,11 +147,15 @@ export interface FileRoutesByTo {
   '/parametres': typeof ParametresRoute
   '/produits': typeof ProduitsRoute
   '/rapports': typeof RapportsRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/transferts': typeof TransfertsRoute
   '/vente': typeof VenteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/app': typeof AppRoute
+  '/auth': typeof AuthRoute
   '/clients': typeof ClientsRoute
   '/comptabilite': typeof ComptabiliteRoute
   '/dashboard': typeof DashboardRoute
@@ -132,12 +167,16 @@ export interface FileRoutesById {
   '/parametres': typeof ParametresRoute
   '/produits': typeof ProduitsRoute
   '/rapports': typeof RapportsRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/transferts': typeof TransfertsRoute
   '/vente': typeof VenteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
+    | '/app'
+    | '/auth'
     | '/clients'
     | '/comptabilite'
     | '/dashboard'
@@ -149,10 +188,14 @@ export interface FileRouteTypes {
     | '/parametres'
     | '/produits'
     | '/rapports'
+    | '/reset-password'
     | '/transferts'
     | '/vente'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
+    | '/app'
+    | '/auth'
     | '/clients'
     | '/comptabilite'
     | '/dashboard'
@@ -164,10 +207,14 @@ export interface FileRouteTypes {
     | '/parametres'
     | '/produits'
     | '/rapports'
+    | '/reset-password'
     | '/transferts'
     | '/vente'
   id:
     | '__root__'
+    | '/'
+    | '/app'
+    | '/auth'
     | '/clients'
     | '/comptabilite'
     | '/dashboard'
@@ -179,11 +226,15 @@ export interface FileRouteTypes {
     | '/parametres'
     | '/produits'
     | '/rapports'
+    | '/reset-password'
     | '/transferts'
     | '/vente'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRoute
+  AuthRoute: typeof AuthRoute
   ClientsRoute: typeof ClientsRoute
   ComptabiliteRoute: typeof ComptabiliteRoute
   DashboardRoute: typeof DashboardRoute
@@ -195,6 +246,7 @@ export interface RootRouteChildren {
   ParametresRoute: typeof ParametresRoute
   ProduitsRoute: typeof ProduitsRoute
   RapportsRoute: typeof RapportsRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   TransfertsRoute: typeof TransfertsRoute
   VenteRoute: typeof VenteRoute
 }
@@ -213,6 +265,13 @@ declare module '@tanstack/react-router' {
       path: '/transferts'
       fullPath: '/transferts'
       preLoaderRoute: typeof TransfertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/rapports': {
@@ -292,10 +351,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClientsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  AppRoute: AppRoute,
+  AuthRoute: AuthRoute,
   ClientsRoute: ClientsRoute,
   ComptabiliteRoute: ComptabiliteRoute,
   DashboardRoute: DashboardRoute,
@@ -307,6 +390,7 @@ const rootRouteChildren: RootRouteChildren = {
   ParametresRoute: ParametresRoute,
   ProduitsRoute: ProduitsRoute,
   RapportsRoute: RapportsRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   TransfertsRoute: TransfertsRoute,
   VenteRoute: VenteRoute,
 }
