@@ -15,6 +15,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RapportsRouteImport } from './routes/rapports'
 import { Route as ProduitsRouteImport } from './routes/produits'
 import { Route as ParametresRouteImport } from './routes/parametres'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as FournisseursRouteImport } from './routes/fournisseurs'
 import { Route as EntreesRouteImport } from './routes/entrees'
 import { Route as EmployesRouteImport } from './routes/employes'
@@ -55,6 +56,11 @@ const ProduitsRoute = ProduitsRouteImport.update({
 const ParametresRoute = ParametresRouteImport.update({
   id: '/parametres',
   path: '/parametres',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FournisseursRoute = FournisseursRouteImport.update({
@@ -125,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/employes': typeof EmployesRoute
   '/entrees': typeof EntreesRoute
   '/fournisseurs': typeof FournisseursRoute
+  '/onboarding': typeof OnboardingRoute
   '/parametres': typeof ParametresRoute
   '/produits': typeof ProduitsRoute
   '/rapports': typeof RapportsRoute
@@ -144,6 +151,7 @@ export interface FileRoutesByTo {
   '/employes': typeof EmployesRoute
   '/entrees': typeof EntreesRoute
   '/fournisseurs': typeof FournisseursRoute
+  '/onboarding': typeof OnboardingRoute
   '/parametres': typeof ParametresRoute
   '/produits': typeof ProduitsRoute
   '/rapports': typeof RapportsRoute
@@ -164,6 +172,7 @@ export interface FileRoutesById {
   '/employes': typeof EmployesRoute
   '/entrees': typeof EntreesRoute
   '/fournisseurs': typeof FournisseursRoute
+  '/onboarding': typeof OnboardingRoute
   '/parametres': typeof ParametresRoute
   '/produits': typeof ProduitsRoute
   '/rapports': typeof RapportsRoute
@@ -185,6 +194,7 @@ export interface FileRouteTypes {
     | '/employes'
     | '/entrees'
     | '/fournisseurs'
+    | '/onboarding'
     | '/parametres'
     | '/produits'
     | '/rapports'
@@ -204,6 +214,7 @@ export interface FileRouteTypes {
     | '/employes'
     | '/entrees'
     | '/fournisseurs'
+    | '/onboarding'
     | '/parametres'
     | '/produits'
     | '/rapports'
@@ -223,6 +234,7 @@ export interface FileRouteTypes {
     | '/employes'
     | '/entrees'
     | '/fournisseurs'
+    | '/onboarding'
     | '/parametres'
     | '/produits'
     | '/rapports'
@@ -243,6 +255,7 @@ export interface RootRouteChildren {
   EmployesRoute: typeof EmployesRoute
   EntreesRoute: typeof EntreesRoute
   FournisseursRoute: typeof FournisseursRoute
+  OnboardingRoute: typeof OnboardingRoute
   ParametresRoute: typeof ParametresRoute
   ProduitsRoute: typeof ProduitsRoute
   RapportsRoute: typeof RapportsRoute
@@ -293,6 +306,13 @@ declare module '@tanstack/react-router' {
       path: '/parametres'
       fullPath: '/parametres'
       preLoaderRoute: typeof ParametresRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fournisseurs': {
@@ -387,6 +407,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmployesRoute: EmployesRoute,
   EntreesRoute: EntreesRoute,
   FournisseursRoute: FournisseursRoute,
+  OnboardingRoute: OnboardingRoute,
   ParametresRoute: ParametresRoute,
   ProduitsRoute: ProduitsRoute,
   RapportsRoute: RapportsRoute,

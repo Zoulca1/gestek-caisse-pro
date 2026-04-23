@@ -115,14 +115,14 @@ function EmptyState() {
         <Step n={3} icon={Settings} title="Vos modules" desc="Caisse, stock, employés..." />
       </div>
 
-      <button
-        disabled
-        className="mt-10 inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-primary-foreground px-6 py-3 font-semibold opacity-60 cursor-not-allowed"
+      <Link
+        to="/onboarding"
+        className="mt-10 inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-primary-foreground px-6 py-3 font-semibold hover:bg-primary/90 transition shadow-lg"
       >
-        <Rocket className="h-4 w-4" /> Démarrer la configuration (Vague 2)
-      </button>
+        <Rocket className="h-4 w-4" /> Démarrer la configuration
+      </Link>
       <p className="mt-3 text-xs text-muted-foreground">
-        Le flux d'onboarding sera ajouté lors de la prochaine vague de développement.
+        Cela ne prend que 2 minutes.
       </p>
     </div>
   );
