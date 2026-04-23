@@ -4,7 +4,7 @@ import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { Sprout, ShieldCheck } from "lucide-react";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/demo")({
   component: LoginPage,
 });
 
