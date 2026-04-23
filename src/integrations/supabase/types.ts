@@ -14,16 +14,267 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          phone: string | null
+          preferred_language: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          preferred_language?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          preferred_language?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tenant_invitations: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string
+          role: Database["public"]["Enums"]["app_role"]
+          tenant_id: string
+          token: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          email: string
+          expires_at?: string
+          id?: string
+          invited_by: string
+          role?: Database["public"]["Enums"]["app_role"]
+          tenant_id: string
+          token?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          tenant_id?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_invitations_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenant_members: {
+        Row: {
+          id: string
+          joined_at: string
+          tenant_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          tenant_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          tenant_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_members_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenant_modules: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          id: string
+          module: Database["public"]["Enums"]["module_key"]
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          module: Database["public"]["Enums"]["module_key"]
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          module?: Database["public"]["Enums"]["module_key"]
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_modules_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenants: {
+        Row: {
+          activity_type: Database["public"]["Enums"]["activity_type"]
+          country: string | null
+          created_at: string
+          currency: string
+          id: string
+          name: string
+          onboarded: boolean
+          owner_id: string
+          plan: Database["public"]["Enums"]["subscription_plan"]
+          slug: string | null
+          trial_ends_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          activity_type?: Database["public"]["Enums"]["activity_type"]
+          country?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          name: string
+          onboarded?: boolean
+          owner_id: string
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          slug?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          activity_type?: Database["public"]["Enums"]["activity_type"]
+          country?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          name?: string
+          onboarded?: boolean
+          owner_id?: string
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          slug?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          tenant_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          tenant_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          tenant_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_tenant_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _tenant_id: string
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_tenant_admin: {
+        Args: { _tenant_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_tenant_member: {
+        Args: { _tenant_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      activity_type:
+        | "pharmacie"
+        | "restaurant"
+        | "boutique_generale"
+        | "quincaillerie"
+        | "cosmetique"
+        | "alimentaire"
+        | "electronique"
+        | "mode"
+        | "autre"
+      app_role: "owner" | "admin" | "vendeur" | "stock" | "comptable" | "viewer"
+      module_key:
+        | "ventes"
+        | "stock"
+        | "clients"
+        | "fournisseurs"
+        | "devis"
+        | "comptabilite"
+        | "employes"
+        | "conges"
+        | "transferts"
+        | "rapports"
+      subscription_plan: "trial" | "starter" | "business" | "pro"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +401,32 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      activity_type: [
+        "pharmacie",
+        "restaurant",
+        "boutique_generale",
+        "quincaillerie",
+        "cosmetique",
+        "alimentaire",
+        "electronique",
+        "mode",
+        "autre",
+      ],
+      app_role: ["owner", "admin", "vendeur", "stock", "comptable", "viewer"],
+      module_key: [
+        "ventes",
+        "stock",
+        "clients",
+        "fournisseurs",
+        "devis",
+        "comptabilite",
+        "employes",
+        "conges",
+        "transferts",
+        "rapports",
+      ],
+      subscription_plan: ["trial", "starter", "business", "pro"],
+    },
   },
 } as const
