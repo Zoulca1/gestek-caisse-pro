@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VenteRouteImport } from './routes/vente'
 import { Route as TransfertsRouteImport } from './routes/transferts'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RapportsRouteImport } from './routes/rapports'
 import { Route as ProduitsRouteImport } from './routes/produits'
 import { Route as ParametresRouteImport } from './routes/parametres'
@@ -18,9 +19,12 @@ import { Route as FournisseursRouteImport } from './routes/fournisseurs'
 import { Route as EntreesRouteImport } from './routes/entrees'
 import { Route as EmployesRouteImport } from './routes/employes'
 import { Route as DevisRouteImport } from './routes/devis'
+import { Route as DemoRouteImport } from './routes/demo'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ComptabiliteRouteImport } from './routes/comptabilite'
 import { Route as ClientsRouteImport } from './routes/clients'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 
 const VenteRoute = VenteRouteImport.update({
@@ -31,6 +35,11 @@ const VenteRoute = VenteRouteImport.update({
 const TransfertsRoute = TransfertsRouteImport.update({
   id: '/transferts',
   path: '/transferts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RapportsRoute = RapportsRouteImport.update({
@@ -68,6 +77,11 @@ const DevisRoute = DevisRouteImport.update({
   path: '/devis',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DemoRoute = DemoRouteImport.update({
+  id: '/demo',
+  path: '/demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -83,6 +97,16 @@ const ClientsRoute = ClientsRouteImport.update({
   path: '/clients',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -91,9 +115,12 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/app': typeof AppRoute
+  '/auth': typeof AuthRoute
   '/clients': typeof ClientsRoute
   '/comptabilite': typeof ComptabiliteRoute
   '/dashboard': typeof DashboardRoute
+  '/demo': typeof DemoRoute
   '/devis': typeof DevisRoute
   '/employes': typeof EmployesRoute
   '/entrees': typeof EntreesRoute
@@ -101,14 +128,18 @@ export interface FileRoutesByFullPath {
   '/parametres': typeof ParametresRoute
   '/produits': typeof ProduitsRoute
   '/rapports': typeof RapportsRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/transferts': typeof TransfertsRoute
   '/vente': typeof VenteRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/app': typeof AppRoute
+  '/auth': typeof AuthRoute
   '/clients': typeof ClientsRoute
   '/comptabilite': typeof ComptabiliteRoute
   '/dashboard': typeof DashboardRoute
+  '/demo': typeof DemoRoute
   '/devis': typeof DevisRoute
   '/employes': typeof EmployesRoute
   '/entrees': typeof EntreesRoute
@@ -116,15 +147,19 @@ export interface FileRoutesByTo {
   '/parametres': typeof ParametresRoute
   '/produits': typeof ProduitsRoute
   '/rapports': typeof RapportsRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/transferts': typeof TransfertsRoute
   '/vente': typeof VenteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/app': typeof AppRoute
+  '/auth': typeof AuthRoute
   '/clients': typeof ClientsRoute
   '/comptabilite': typeof ComptabiliteRoute
   '/dashboard': typeof DashboardRoute
+  '/demo': typeof DemoRoute
   '/devis': typeof DevisRoute
   '/employes': typeof EmployesRoute
   '/entrees': typeof EntreesRoute
@@ -132,6 +167,7 @@ export interface FileRoutesById {
   '/parametres': typeof ParametresRoute
   '/produits': typeof ProduitsRoute
   '/rapports': typeof RapportsRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/transferts': typeof TransfertsRoute
   '/vente': typeof VenteRoute
 }
@@ -139,9 +175,12 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/app'
+    | '/auth'
     | '/clients'
     | '/comptabilite'
     | '/dashboard'
+    | '/demo'
     | '/devis'
     | '/employes'
     | '/entrees'
@@ -149,14 +188,18 @@ export interface FileRouteTypes {
     | '/parametres'
     | '/produits'
     | '/rapports'
+    | '/reset-password'
     | '/transferts'
     | '/vente'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/app'
+    | '/auth'
     | '/clients'
     | '/comptabilite'
     | '/dashboard'
+    | '/demo'
     | '/devis'
     | '/employes'
     | '/entrees'
@@ -164,14 +207,18 @@ export interface FileRouteTypes {
     | '/parametres'
     | '/produits'
     | '/rapports'
+    | '/reset-password'
     | '/transferts'
     | '/vente'
   id:
     | '__root__'
     | '/'
+    | '/app'
+    | '/auth'
     | '/clients'
     | '/comptabilite'
     | '/dashboard'
+    | '/demo'
     | '/devis'
     | '/employes'
     | '/entrees'
@@ -179,15 +226,19 @@ export interface FileRouteTypes {
     | '/parametres'
     | '/produits'
     | '/rapports'
+    | '/reset-password'
     | '/transferts'
     | '/vente'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRoute
+  AuthRoute: typeof AuthRoute
   ClientsRoute: typeof ClientsRoute
   ComptabiliteRoute: typeof ComptabiliteRoute
   DashboardRoute: typeof DashboardRoute
+  DemoRoute: typeof DemoRoute
   DevisRoute: typeof DevisRoute
   EmployesRoute: typeof EmployesRoute
   EntreesRoute: typeof EntreesRoute
@@ -195,6 +246,7 @@ export interface RootRouteChildren {
   ParametresRoute: typeof ParametresRoute
   ProduitsRoute: typeof ProduitsRoute
   RapportsRoute: typeof RapportsRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   TransfertsRoute: typeof TransfertsRoute
   VenteRoute: typeof VenteRoute
 }
@@ -213,6 +265,13 @@ declare module '@tanstack/react-router' {
       path: '/transferts'
       fullPath: '/transferts'
       preLoaderRoute: typeof TransfertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/rapports': {
@@ -264,6 +323,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DevisRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/demo': {
+      id: '/demo'
+      path: '/demo'
+      fullPath: '/demo'
+      preLoaderRoute: typeof DemoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -285,6 +351,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClientsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -297,9 +377,12 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRoute,
+  AuthRoute: AuthRoute,
   ClientsRoute: ClientsRoute,
   ComptabiliteRoute: ComptabiliteRoute,
   DashboardRoute: DashboardRoute,
+  DemoRoute: DemoRoute,
   DevisRoute: DevisRoute,
   EmployesRoute: EmployesRoute,
   EntreesRoute: EntreesRoute,
@@ -307,18 +390,10 @@ const rootRouteChildren: RootRouteChildren = {
   ParametresRoute: ParametresRoute,
   ProduitsRoute: ProduitsRoute,
   RapportsRoute: RapportsRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   TransfertsRoute: TransfertsRoute,
   VenteRoute: VenteRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

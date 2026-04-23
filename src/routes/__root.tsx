@@ -1,6 +1,7 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/lib/auth";
+import { CloudAuthProvider } from "@/lib/cloud-auth";
 import { ThemeProvider } from "@/lib/theme";
 import { DataProvider } from "@/lib/store";
 
@@ -68,12 +69,14 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <DataProvider>
-          <Outlet />
-          <Toaster richColors position="top-right" />
-        </DataProvider>
-      </AuthProvider>
+      <CloudAuthProvider>
+        <AuthProvider>
+          <DataProvider>
+            <Outlet />
+            <Toaster richColors position="top-right" />
+          </DataProvider>
+        </AuthProvider>
+      </CloudAuthProvider>
     </ThemeProvider>
   );
 }
