@@ -1,8 +1,9 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useCloudAuth } from "@/lib/cloud-auth";
+import { useTenant } from "@/lib/tenant";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, LogOut, Sparkles, Building2, Settings, Rocket } from "lucide-react";
+import { Loader2, LogOut, Sparkles, Building2, Settings, Rocket, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/app")({
@@ -143,6 +144,15 @@ function Step({ n, icon: Icon, title, desc }: { n: number; icon: any; title: str
 }
 
 function TenantList({ tenants }: { tenants: TenantSummary[] }) {
+  const { setActiveTenant } = useTenant();
+  const navigate = useNavigate();
+
+  const open = (id: string, onboarded: boolean) => {
+    setActiveTenant(id);
+    if (!onboarded) navigate({ to: "/onboarding" });
+    else navigate({ to: "/workspace/dashboard" });
+  };
+
   return (
     <div className="max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-6">
@@ -150,18 +160,29 @@ function TenantList({ tenants }: { tenants: TenantSummary[] }) {
           <h1 className="font-display font-bold text-2xl">Mes entreprises</h1>
           <p className="text-sm text-muted-foreground">Sélectionnez une entreprise pour y accéder.</p>
         </div>
+        <Link
+          to="/onboarding"
+          className="inline-flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm font-semibold hover:bg-muted"
+        >
+          <Sparkles className="h-4 w-4" /> Nouvelle entreprise
+        </Link>
       </div>
       <div className="space-y-3">
         {tenants.map((t) => (
-          <div key={t.id} className="rounded-xl border border-border bg-card p-5 flex items-center justify-between">
+          <button
+            key={t.id}
+            onClick={() => open(t.id, t.onboarded)}
+            className="w-full text-left rounded-xl border border-border bg-card p-5 flex items-center justify-between hover:border-primary transition group"
+          >
             <div>
               <div className="font-semibold">{t.name}</div>
               <div className="text-xs text-muted-foreground capitalize">{t.activity_type.replace("_", " ")} · Plan {t.plan}</div>
             </div>
-            <div className="text-xs text-muted-foreground">
+            <div className="flex items-center gap-3 text-xs text-muted-foreground">
               {t.onboarded ? "Configuré" : "À configurer"}
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition" />
             </div>
-          </div>
+          </button>
         ))}
       </div>
     </div>
