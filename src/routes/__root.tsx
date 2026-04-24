@@ -2,6 +2,7 @@ import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/r
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/lib/auth";
 import { CloudAuthProvider } from "@/lib/cloud-auth";
+import { TenantProvider } from "@/lib/tenant";
 import { ThemeProvider } from "@/lib/theme";
 import { DataProvider } from "@/lib/store";
 
@@ -70,12 +71,14 @@ function RootComponent() {
   return (
     <ThemeProvider>
       <CloudAuthProvider>
-        <AuthProvider>
-          <DataProvider>
-            <Outlet />
-            <Toaster richColors position="top-right" />
-          </DataProvider>
-        </AuthProvider>
+        <TenantProvider>
+          <AuthProvider>
+            <DataProvider>
+              <Outlet />
+              <Toaster richColors position="top-right" />
+            </DataProvider>
+          </AuthProvider>
+        </TenantProvider>
       </CloudAuthProvider>
     </ThemeProvider>
   );
