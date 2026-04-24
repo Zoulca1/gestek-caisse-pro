@@ -1,4 +1,4 @@
-import { createFileRoute, Link, Outlet, useLocation, useNavigate, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Loader2, LogOut, Menu, X, Moon, Sun, Building2, ChevronDown, AlertTriangle } from "lucide-react";
 import { useCloudAuth } from "@/lib/cloud-auth";
