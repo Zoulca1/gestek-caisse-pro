@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useCloudAuth } from "@/lib/cloud-auth";
+import { useTenant } from "@/lib/tenant";
 import { supabase } from "@/integrations/supabase/client";
 import { ACTIVITY_PRESETS, ALL_MODULES, getPreset, type ActivityType, type ModuleKey } from "@/lib/activity-presets";
 import {
@@ -17,6 +18,7 @@ type Step = 1 | 2 | 3 | 4;
 
 function OnboardingPage() {
   const { user, loading: authLoading } = useCloudAuth();
+  const { setActiveTenant } = useTenant();
   const navigate = useNavigate();
 
   const [step, setStep] = useState<Step>(1);
@@ -109,6 +111,7 @@ function OnboardingPage() {
       }
 
       setCreatedTenantName(tenant.name);
+      setActiveTenant(tenant.id);
       setStep(4);
       toast.success("Entreprise créée !");
     } catch (err: any) {
@@ -411,21 +414,21 @@ function StepDone({ companyName, activity, modules }: { companyName: string; act
 
       <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
         <Link
-          to="/app"
+          to="/workspace/dashboard"
           className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-primary-foreground px-6 py-3 text-sm font-semibold hover:bg-primary/90 transition"
         >
           <Sparkles className="h-4 w-4" /> Accéder à mon espace
         </Link>
         <Link
-          to="/demo"
+          to="/app"
           className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-6 py-3 text-sm font-semibold hover:bg-muted transition"
         >
-          Voir la démo
+          Mes entreprises
         </Link>
       </div>
 
       <p className="mt-6 text-xs text-muted-foreground">
-        Le dashboard SaaS complet sera disponible en Vague 3 (migration des données métier).
+        Votre espace est prêt avec {modules.size} module{modules.size > 1 ? "s" : ""} actif{modules.size > 1 ? "s" : ""}.
       </p>
     </div>
   );
