@@ -5,7 +5,7 @@ import { useTenant } from "@/lib/tenant";
 import { Loader2, Plus, Trash2, Search } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_workspace/workspace/produits")({
+export const Route = createFileRoute("/workspace/produits")({
   component: ProductsCloud,
 });
 

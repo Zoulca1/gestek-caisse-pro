@@ -7,7 +7,7 @@ import { useTheme } from "@/lib/theme";
 import { CLOUD_NAV, moduleForPath } from "@/lib/module-routes";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_workspace")({
+export const Route = createFileRoute("/workspace")({
   beforeLoad: () => {
     // Auth check is done in component to avoid SSR issues with Supabase localStorage
   },

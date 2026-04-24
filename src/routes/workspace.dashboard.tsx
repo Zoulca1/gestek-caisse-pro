@@ -5,7 +5,7 @@ import { useTenant } from "@/lib/tenant";
 import { Loader2, ShoppingCart, Package, Users, TrendingUp, AlertTriangle } from "lucide-react";
 import { CLOUD_NAV } from "@/lib/module-routes";
 
-export const Route = createFileRoute("/_workspace/workspace/dashboard")({
+export const Route = createFileRoute("/workspace/dashboard")({
   component: CloudDashboard,
 });
 
