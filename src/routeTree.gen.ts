@@ -26,7 +26,10 @@ import { Route as ComptabiliteRouteImport } from './routes/comptabilite'
 import { Route as ClientsRouteImport } from './routes/clients'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
+import { Route as WorkspaceRouteImport } from './routes/_workspace'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WorkspaceWorkspaceProduitsRouteImport } from './routes/_workspace.workspace.produits'
+import { Route as WorkspaceWorkspaceDashboardRouteImport } from './routes/_workspace.workspace.dashboard'
 
 const VenteRoute = VenteRouteImport.update({
   id: '/vente',
@@ -113,11 +116,27 @@ const AppRoute = AppRouteImport.update({
   path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorkspaceRoute = WorkspaceRouteImport.update({
+  id: '/_workspace',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorkspaceWorkspaceProduitsRoute =
+  WorkspaceWorkspaceProduitsRouteImport.update({
+    id: '/workspace/produits',
+    path: '/workspace/produits',
+    getParentRoute: () => WorkspaceRoute,
+  } as any)
+const WorkspaceWorkspaceDashboardRoute =
+  WorkspaceWorkspaceDashboardRouteImport.update({
+    id: '/workspace/dashboard',
+    path: '/workspace/dashboard',
+    getParentRoute: () => WorkspaceRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -138,6 +157,8 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/transferts': typeof TransfertsRoute
   '/vente': typeof VenteRoute
+  '/workspace/dashboard': typeof WorkspaceWorkspaceDashboardRoute
+  '/workspace/produits': typeof WorkspaceWorkspaceProduitsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -158,10 +179,13 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/transferts': typeof TransfertsRoute
   '/vente': typeof VenteRoute
+  '/workspace/dashboard': typeof WorkspaceWorkspaceDashboardRoute
+  '/workspace/produits': typeof WorkspaceWorkspaceProduitsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_workspace': typeof WorkspaceRouteWithChildren
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
   '/clients': typeof ClientsRoute
@@ -179,6 +203,8 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/transferts': typeof TransfertsRoute
   '/vente': typeof VenteRoute
+  '/_workspace/workspace/dashboard': typeof WorkspaceWorkspaceDashboardRoute
+  '/_workspace/workspace/produits': typeof WorkspaceWorkspaceProduitsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -201,6 +227,8 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/transferts'
     | '/vente'
+    | '/workspace/dashboard'
+    | '/workspace/produits'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -221,9 +249,12 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/transferts'
     | '/vente'
+    | '/workspace/dashboard'
+    | '/workspace/produits'
   id:
     | '__root__'
     | '/'
+    | '/_workspace'
     | '/app'
     | '/auth'
     | '/clients'
@@ -241,10 +272,13 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/transferts'
     | '/vente'
+    | '/_workspace/workspace/dashboard'
+    | '/_workspace/workspace/produits'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  WorkspaceRoute: typeof WorkspaceRouteWithChildren
   AppRoute: typeof AppRoute
   AuthRoute: typeof AuthRoute
   ClientsRoute: typeof ClientsRoute
@@ -385,6 +419,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_workspace': {
+      id: '/_workspace'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof WorkspaceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -392,11 +433,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_workspace/workspace/produits': {
+      id: '/_workspace/workspace/produits'
+      path: '/workspace/produits'
+      fullPath: '/workspace/produits'
+      preLoaderRoute: typeof WorkspaceWorkspaceProduitsRouteImport
+      parentRoute: typeof WorkspaceRoute
+    }
+    '/_workspace/workspace/dashboard': {
+      id: '/_workspace/workspace/dashboard'
+      path: '/workspace/dashboard'
+      fullPath: '/workspace/dashboard'
+      preLoaderRoute: typeof WorkspaceWorkspaceDashboardRouteImport
+      parentRoute: typeof WorkspaceRoute
+    }
   }
 }
 
+interface WorkspaceRouteChildren {
+  WorkspaceWorkspaceDashboardRoute: typeof WorkspaceWorkspaceDashboardRoute
+  WorkspaceWorkspaceProduitsRoute: typeof WorkspaceWorkspaceProduitsRoute
+}
+
+const WorkspaceRouteChildren: WorkspaceRouteChildren = {
+  WorkspaceWorkspaceDashboardRoute: WorkspaceWorkspaceDashboardRoute,
+  WorkspaceWorkspaceProduitsRoute: WorkspaceWorkspaceProduitsRoute,
+}
+
+const WorkspaceRouteWithChildren = WorkspaceRoute._addFileChildren(
+  WorkspaceRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  WorkspaceRoute: WorkspaceRouteWithChildren,
   AppRoute: AppRoute,
   AuthRoute: AuthRoute,
   ClientsRoute: ClientsRoute,
