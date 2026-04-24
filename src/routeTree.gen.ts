@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WorkspaceRouteImport } from './routes/workspace'
 import { Route as VenteRouteImport } from './routes/vente'
 import { Route as TransfertsRouteImport } from './routes/transferts'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -26,20 +27,24 @@ import { Route as ComptabiliteRouteImport } from './routes/comptabilite'
 import { Route as ClientsRouteImport } from './routes/clients'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
-import { Route as WorkspaceRouteImport } from './routes/_workspace'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as WorkspaceWorkspaceVentesRouteImport } from './routes/_workspace.workspace.ventes'
-import { Route as WorkspaceWorkspaceTransfertsRouteImport } from './routes/_workspace.workspace.transferts'
-import { Route as WorkspaceWorkspaceRapportsRouteImport } from './routes/_workspace.workspace.rapports'
-import { Route as WorkspaceWorkspaceProduitsRouteImport } from './routes/_workspace.workspace.produits'
-import { Route as WorkspaceWorkspaceFournisseursRouteImport } from './routes/_workspace.workspace.fournisseurs'
-import { Route as WorkspaceWorkspaceEntreesRouteImport } from './routes/_workspace.workspace.entrees'
-import { Route as WorkspaceWorkspaceEmployesRouteImport } from './routes/_workspace.workspace.employes'
-import { Route as WorkspaceWorkspaceDevisRouteImport } from './routes/_workspace.workspace.devis'
-import { Route as WorkspaceWorkspaceDashboardRouteImport } from './routes/_workspace.workspace.dashboard'
-import { Route as WorkspaceWorkspaceComptabiliteRouteImport } from './routes/_workspace.workspace.comptabilite'
-import { Route as WorkspaceWorkspaceClientsRouteImport } from './routes/_workspace.workspace.clients'
+import { Route as WorkspaceVentesRouteImport } from './routes/workspace.ventes'
+import { Route as WorkspaceTransfertsRouteImport } from './routes/workspace.transferts'
+import { Route as WorkspaceRapportsRouteImport } from './routes/workspace.rapports'
+import { Route as WorkspaceProduitsRouteImport } from './routes/workspace.produits'
+import { Route as WorkspaceFournisseursRouteImport } from './routes/workspace.fournisseurs'
+import { Route as WorkspaceEntreesRouteImport } from './routes/workspace.entrees'
+import { Route as WorkspaceEmployesRouteImport } from './routes/workspace.employes'
+import { Route as WorkspaceDevisRouteImport } from './routes/workspace.devis'
+import { Route as WorkspaceDashboardRouteImport } from './routes/workspace.dashboard'
+import { Route as WorkspaceComptabiliteRouteImport } from './routes/workspace.comptabilite'
+import { Route as WorkspaceClientsRouteImport } from './routes/workspace.clients'
 
+const WorkspaceRoute = WorkspaceRouteImport.update({
+  id: '/workspace',
+  path: '/workspace',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VenteRoute = VenteRouteImport.update({
   id: '/vente',
   path: '/vente',
@@ -125,80 +130,66 @@ const AppRoute = AppRouteImport.update({
   path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
-const WorkspaceRoute = WorkspaceRouteImport.update({
-  id: '/_workspace',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const WorkspaceWorkspaceVentesRoute =
-  WorkspaceWorkspaceVentesRouteImport.update({
-    id: '/workspace/ventes',
-    path: '/workspace/ventes',
-    getParentRoute: () => WorkspaceRoute,
-  } as any)
-const WorkspaceWorkspaceTransfertsRoute =
-  WorkspaceWorkspaceTransfertsRouteImport.update({
-    id: '/workspace/transferts',
-    path: '/workspace/transferts',
-    getParentRoute: () => WorkspaceRoute,
-  } as any)
-const WorkspaceWorkspaceRapportsRoute =
-  WorkspaceWorkspaceRapportsRouteImport.update({
-    id: '/workspace/rapports',
-    path: '/workspace/rapports',
-    getParentRoute: () => WorkspaceRoute,
-  } as any)
-const WorkspaceWorkspaceProduitsRoute =
-  WorkspaceWorkspaceProduitsRouteImport.update({
-    id: '/workspace/produits',
-    path: '/workspace/produits',
-    getParentRoute: () => WorkspaceRoute,
-  } as any)
-const WorkspaceWorkspaceFournisseursRoute =
-  WorkspaceWorkspaceFournisseursRouteImport.update({
-    id: '/workspace/fournisseurs',
-    path: '/workspace/fournisseurs',
-    getParentRoute: () => WorkspaceRoute,
-  } as any)
-const WorkspaceWorkspaceEntreesRoute =
-  WorkspaceWorkspaceEntreesRouteImport.update({
-    id: '/workspace/entrees',
-    path: '/workspace/entrees',
-    getParentRoute: () => WorkspaceRoute,
-  } as any)
-const WorkspaceWorkspaceEmployesRoute =
-  WorkspaceWorkspaceEmployesRouteImport.update({
-    id: '/workspace/employes',
-    path: '/workspace/employes',
-    getParentRoute: () => WorkspaceRoute,
-  } as any)
-const WorkspaceWorkspaceDevisRoute = WorkspaceWorkspaceDevisRouteImport.update({
-  id: '/workspace/devis',
-  path: '/workspace/devis',
+const WorkspaceVentesRoute = WorkspaceVentesRouteImport.update({
+  id: '/ventes',
+  path: '/ventes',
   getParentRoute: () => WorkspaceRoute,
 } as any)
-const WorkspaceWorkspaceDashboardRoute =
-  WorkspaceWorkspaceDashboardRouteImport.update({
-    id: '/workspace/dashboard',
-    path: '/workspace/dashboard',
-    getParentRoute: () => WorkspaceRoute,
-  } as any)
-const WorkspaceWorkspaceComptabiliteRoute =
-  WorkspaceWorkspaceComptabiliteRouteImport.update({
-    id: '/workspace/comptabilite',
-    path: '/workspace/comptabilite',
-    getParentRoute: () => WorkspaceRoute,
-  } as any)
-const WorkspaceWorkspaceClientsRoute =
-  WorkspaceWorkspaceClientsRouteImport.update({
-    id: '/workspace/clients',
-    path: '/workspace/clients',
-    getParentRoute: () => WorkspaceRoute,
-  } as any)
+const WorkspaceTransfertsRoute = WorkspaceTransfertsRouteImport.update({
+  id: '/transferts',
+  path: '/transferts',
+  getParentRoute: () => WorkspaceRoute,
+} as any)
+const WorkspaceRapportsRoute = WorkspaceRapportsRouteImport.update({
+  id: '/rapports',
+  path: '/rapports',
+  getParentRoute: () => WorkspaceRoute,
+} as any)
+const WorkspaceProduitsRoute = WorkspaceProduitsRouteImport.update({
+  id: '/produits',
+  path: '/produits',
+  getParentRoute: () => WorkspaceRoute,
+} as any)
+const WorkspaceFournisseursRoute = WorkspaceFournisseursRouteImport.update({
+  id: '/fournisseurs',
+  path: '/fournisseurs',
+  getParentRoute: () => WorkspaceRoute,
+} as any)
+const WorkspaceEntreesRoute = WorkspaceEntreesRouteImport.update({
+  id: '/entrees',
+  path: '/entrees',
+  getParentRoute: () => WorkspaceRoute,
+} as any)
+const WorkspaceEmployesRoute = WorkspaceEmployesRouteImport.update({
+  id: '/employes',
+  path: '/employes',
+  getParentRoute: () => WorkspaceRoute,
+} as any)
+const WorkspaceDevisRoute = WorkspaceDevisRouteImport.update({
+  id: '/devis',
+  path: '/devis',
+  getParentRoute: () => WorkspaceRoute,
+} as any)
+const WorkspaceDashboardRoute = WorkspaceDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => WorkspaceRoute,
+} as any)
+const WorkspaceComptabiliteRoute = WorkspaceComptabiliteRouteImport.update({
+  id: '/comptabilite',
+  path: '/comptabilite',
+  getParentRoute: () => WorkspaceRoute,
+} as any)
+const WorkspaceClientsRoute = WorkspaceClientsRouteImport.update({
+  id: '/clients',
+  path: '/clients',
+  getParentRoute: () => WorkspaceRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -219,17 +210,18 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/transferts': typeof TransfertsRoute
   '/vente': typeof VenteRoute
-  '/workspace/clients': typeof WorkspaceWorkspaceClientsRoute
-  '/workspace/comptabilite': typeof WorkspaceWorkspaceComptabiliteRoute
-  '/workspace/dashboard': typeof WorkspaceWorkspaceDashboardRoute
-  '/workspace/devis': typeof WorkspaceWorkspaceDevisRoute
-  '/workspace/employes': typeof WorkspaceWorkspaceEmployesRoute
-  '/workspace/entrees': typeof WorkspaceWorkspaceEntreesRoute
-  '/workspace/fournisseurs': typeof WorkspaceWorkspaceFournisseursRoute
-  '/workspace/produits': typeof WorkspaceWorkspaceProduitsRoute
-  '/workspace/rapports': typeof WorkspaceWorkspaceRapportsRoute
-  '/workspace/transferts': typeof WorkspaceWorkspaceTransfertsRoute
-  '/workspace/ventes': typeof WorkspaceWorkspaceVentesRoute
+  '/workspace': typeof WorkspaceRouteWithChildren
+  '/workspace/clients': typeof WorkspaceClientsRoute
+  '/workspace/comptabilite': typeof WorkspaceComptabiliteRoute
+  '/workspace/dashboard': typeof WorkspaceDashboardRoute
+  '/workspace/devis': typeof WorkspaceDevisRoute
+  '/workspace/employes': typeof WorkspaceEmployesRoute
+  '/workspace/entrees': typeof WorkspaceEntreesRoute
+  '/workspace/fournisseurs': typeof WorkspaceFournisseursRoute
+  '/workspace/produits': typeof WorkspaceProduitsRoute
+  '/workspace/rapports': typeof WorkspaceRapportsRoute
+  '/workspace/transferts': typeof WorkspaceTransfertsRoute
+  '/workspace/ventes': typeof WorkspaceVentesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -250,22 +242,22 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/transferts': typeof TransfertsRoute
   '/vente': typeof VenteRoute
-  '/workspace/clients': typeof WorkspaceWorkspaceClientsRoute
-  '/workspace/comptabilite': typeof WorkspaceWorkspaceComptabiliteRoute
-  '/workspace/dashboard': typeof WorkspaceWorkspaceDashboardRoute
-  '/workspace/devis': typeof WorkspaceWorkspaceDevisRoute
-  '/workspace/employes': typeof WorkspaceWorkspaceEmployesRoute
-  '/workspace/entrees': typeof WorkspaceWorkspaceEntreesRoute
-  '/workspace/fournisseurs': typeof WorkspaceWorkspaceFournisseursRoute
-  '/workspace/produits': typeof WorkspaceWorkspaceProduitsRoute
-  '/workspace/rapports': typeof WorkspaceWorkspaceRapportsRoute
-  '/workspace/transferts': typeof WorkspaceWorkspaceTransfertsRoute
-  '/workspace/ventes': typeof WorkspaceWorkspaceVentesRoute
+  '/workspace': typeof WorkspaceRouteWithChildren
+  '/workspace/clients': typeof WorkspaceClientsRoute
+  '/workspace/comptabilite': typeof WorkspaceComptabiliteRoute
+  '/workspace/dashboard': typeof WorkspaceDashboardRoute
+  '/workspace/devis': typeof WorkspaceDevisRoute
+  '/workspace/employes': typeof WorkspaceEmployesRoute
+  '/workspace/entrees': typeof WorkspaceEntreesRoute
+  '/workspace/fournisseurs': typeof WorkspaceFournisseursRoute
+  '/workspace/produits': typeof WorkspaceProduitsRoute
+  '/workspace/rapports': typeof WorkspaceRapportsRoute
+  '/workspace/transferts': typeof WorkspaceTransfertsRoute
+  '/workspace/ventes': typeof WorkspaceVentesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_workspace': typeof WorkspaceRouteWithChildren
   '/app': typeof AppRoute
   '/auth': typeof AuthRoute
   '/clients': typeof ClientsRoute
@@ -283,17 +275,18 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/transferts': typeof TransfertsRoute
   '/vente': typeof VenteRoute
-  '/_workspace/workspace/clients': typeof WorkspaceWorkspaceClientsRoute
-  '/_workspace/workspace/comptabilite': typeof WorkspaceWorkspaceComptabiliteRoute
-  '/_workspace/workspace/dashboard': typeof WorkspaceWorkspaceDashboardRoute
-  '/_workspace/workspace/devis': typeof WorkspaceWorkspaceDevisRoute
-  '/_workspace/workspace/employes': typeof WorkspaceWorkspaceEmployesRoute
-  '/_workspace/workspace/entrees': typeof WorkspaceWorkspaceEntreesRoute
-  '/_workspace/workspace/fournisseurs': typeof WorkspaceWorkspaceFournisseursRoute
-  '/_workspace/workspace/produits': typeof WorkspaceWorkspaceProduitsRoute
-  '/_workspace/workspace/rapports': typeof WorkspaceWorkspaceRapportsRoute
-  '/_workspace/workspace/transferts': typeof WorkspaceWorkspaceTransfertsRoute
-  '/_workspace/workspace/ventes': typeof WorkspaceWorkspaceVentesRoute
+  '/workspace': typeof WorkspaceRouteWithChildren
+  '/workspace/clients': typeof WorkspaceClientsRoute
+  '/workspace/comptabilite': typeof WorkspaceComptabiliteRoute
+  '/workspace/dashboard': typeof WorkspaceDashboardRoute
+  '/workspace/devis': typeof WorkspaceDevisRoute
+  '/workspace/employes': typeof WorkspaceEmployesRoute
+  '/workspace/entrees': typeof WorkspaceEntreesRoute
+  '/workspace/fournisseurs': typeof WorkspaceFournisseursRoute
+  '/workspace/produits': typeof WorkspaceProduitsRoute
+  '/workspace/rapports': typeof WorkspaceRapportsRoute
+  '/workspace/transferts': typeof WorkspaceTransfertsRoute
+  '/workspace/ventes': typeof WorkspaceVentesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -316,6 +309,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/transferts'
     | '/vente'
+    | '/workspace'
     | '/workspace/clients'
     | '/workspace/comptabilite'
     | '/workspace/dashboard'
@@ -347,6 +341,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/transferts'
     | '/vente'
+    | '/workspace'
     | '/workspace/clients'
     | '/workspace/comptabilite'
     | '/workspace/dashboard'
@@ -361,7 +356,6 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/_workspace'
     | '/app'
     | '/auth'
     | '/clients'
@@ -379,22 +373,22 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/transferts'
     | '/vente'
-    | '/_workspace/workspace/clients'
-    | '/_workspace/workspace/comptabilite'
-    | '/_workspace/workspace/dashboard'
-    | '/_workspace/workspace/devis'
-    | '/_workspace/workspace/employes'
-    | '/_workspace/workspace/entrees'
-    | '/_workspace/workspace/fournisseurs'
-    | '/_workspace/workspace/produits'
-    | '/_workspace/workspace/rapports'
-    | '/_workspace/workspace/transferts'
-    | '/_workspace/workspace/ventes'
+    | '/workspace'
+    | '/workspace/clients'
+    | '/workspace/comptabilite'
+    | '/workspace/dashboard'
+    | '/workspace/devis'
+    | '/workspace/employes'
+    | '/workspace/entrees'
+    | '/workspace/fournisseurs'
+    | '/workspace/produits'
+    | '/workspace/rapports'
+    | '/workspace/transferts'
+    | '/workspace/ventes'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  WorkspaceRoute: typeof WorkspaceRouteWithChildren
   AppRoute: typeof AppRoute
   AuthRoute: typeof AuthRoute
   ClientsRoute: typeof ClientsRoute
@@ -412,10 +406,18 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   TransfertsRoute: typeof TransfertsRoute
   VenteRoute: typeof VenteRoute
+  WorkspaceRoute: typeof WorkspaceRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/workspace': {
+      id: '/workspace'
+      path: '/workspace'
+      fullPath: '/workspace'
+      preLoaderRoute: typeof WorkspaceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/vente': {
       id: '/vente'
       path: '/vente'
@@ -535,13 +537,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_workspace': {
-      id: '/_workspace'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof WorkspaceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -549,112 +544,112 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_workspace/workspace/ventes': {
-      id: '/_workspace/workspace/ventes'
-      path: '/workspace/ventes'
+    '/workspace/ventes': {
+      id: '/workspace/ventes'
+      path: '/ventes'
       fullPath: '/workspace/ventes'
-      preLoaderRoute: typeof WorkspaceWorkspaceVentesRouteImport
+      preLoaderRoute: typeof WorkspaceVentesRouteImport
       parentRoute: typeof WorkspaceRoute
     }
-    '/_workspace/workspace/transferts': {
-      id: '/_workspace/workspace/transferts'
-      path: '/workspace/transferts'
+    '/workspace/transferts': {
+      id: '/workspace/transferts'
+      path: '/transferts'
       fullPath: '/workspace/transferts'
-      preLoaderRoute: typeof WorkspaceWorkspaceTransfertsRouteImport
+      preLoaderRoute: typeof WorkspaceTransfertsRouteImport
       parentRoute: typeof WorkspaceRoute
     }
-    '/_workspace/workspace/rapports': {
-      id: '/_workspace/workspace/rapports'
-      path: '/workspace/rapports'
+    '/workspace/rapports': {
+      id: '/workspace/rapports'
+      path: '/rapports'
       fullPath: '/workspace/rapports'
-      preLoaderRoute: typeof WorkspaceWorkspaceRapportsRouteImport
+      preLoaderRoute: typeof WorkspaceRapportsRouteImport
       parentRoute: typeof WorkspaceRoute
     }
-    '/_workspace/workspace/produits': {
-      id: '/_workspace/workspace/produits'
-      path: '/workspace/produits'
+    '/workspace/produits': {
+      id: '/workspace/produits'
+      path: '/produits'
       fullPath: '/workspace/produits'
-      preLoaderRoute: typeof WorkspaceWorkspaceProduitsRouteImport
+      preLoaderRoute: typeof WorkspaceProduitsRouteImport
       parentRoute: typeof WorkspaceRoute
     }
-    '/_workspace/workspace/fournisseurs': {
-      id: '/_workspace/workspace/fournisseurs'
-      path: '/workspace/fournisseurs'
+    '/workspace/fournisseurs': {
+      id: '/workspace/fournisseurs'
+      path: '/fournisseurs'
       fullPath: '/workspace/fournisseurs'
-      preLoaderRoute: typeof WorkspaceWorkspaceFournisseursRouteImport
+      preLoaderRoute: typeof WorkspaceFournisseursRouteImport
       parentRoute: typeof WorkspaceRoute
     }
-    '/_workspace/workspace/entrees': {
-      id: '/_workspace/workspace/entrees'
-      path: '/workspace/entrees'
+    '/workspace/entrees': {
+      id: '/workspace/entrees'
+      path: '/entrees'
       fullPath: '/workspace/entrees'
-      preLoaderRoute: typeof WorkspaceWorkspaceEntreesRouteImport
+      preLoaderRoute: typeof WorkspaceEntreesRouteImport
       parentRoute: typeof WorkspaceRoute
     }
-    '/_workspace/workspace/employes': {
-      id: '/_workspace/workspace/employes'
-      path: '/workspace/employes'
+    '/workspace/employes': {
+      id: '/workspace/employes'
+      path: '/employes'
       fullPath: '/workspace/employes'
-      preLoaderRoute: typeof WorkspaceWorkspaceEmployesRouteImport
+      preLoaderRoute: typeof WorkspaceEmployesRouteImport
       parentRoute: typeof WorkspaceRoute
     }
-    '/_workspace/workspace/devis': {
-      id: '/_workspace/workspace/devis'
-      path: '/workspace/devis'
+    '/workspace/devis': {
+      id: '/workspace/devis'
+      path: '/devis'
       fullPath: '/workspace/devis'
-      preLoaderRoute: typeof WorkspaceWorkspaceDevisRouteImport
+      preLoaderRoute: typeof WorkspaceDevisRouteImport
       parentRoute: typeof WorkspaceRoute
     }
-    '/_workspace/workspace/dashboard': {
-      id: '/_workspace/workspace/dashboard'
-      path: '/workspace/dashboard'
+    '/workspace/dashboard': {
+      id: '/workspace/dashboard'
+      path: '/dashboard'
       fullPath: '/workspace/dashboard'
-      preLoaderRoute: typeof WorkspaceWorkspaceDashboardRouteImport
+      preLoaderRoute: typeof WorkspaceDashboardRouteImport
       parentRoute: typeof WorkspaceRoute
     }
-    '/_workspace/workspace/comptabilite': {
-      id: '/_workspace/workspace/comptabilite'
-      path: '/workspace/comptabilite'
+    '/workspace/comptabilite': {
+      id: '/workspace/comptabilite'
+      path: '/comptabilite'
       fullPath: '/workspace/comptabilite'
-      preLoaderRoute: typeof WorkspaceWorkspaceComptabiliteRouteImport
+      preLoaderRoute: typeof WorkspaceComptabiliteRouteImport
       parentRoute: typeof WorkspaceRoute
     }
-    '/_workspace/workspace/clients': {
-      id: '/_workspace/workspace/clients'
-      path: '/workspace/clients'
+    '/workspace/clients': {
+      id: '/workspace/clients'
+      path: '/clients'
       fullPath: '/workspace/clients'
-      preLoaderRoute: typeof WorkspaceWorkspaceClientsRouteImport
+      preLoaderRoute: typeof WorkspaceClientsRouteImport
       parentRoute: typeof WorkspaceRoute
     }
   }
 }
 
 interface WorkspaceRouteChildren {
-  WorkspaceWorkspaceClientsRoute: typeof WorkspaceWorkspaceClientsRoute
-  WorkspaceWorkspaceComptabiliteRoute: typeof WorkspaceWorkspaceComptabiliteRoute
-  WorkspaceWorkspaceDashboardRoute: typeof WorkspaceWorkspaceDashboardRoute
-  WorkspaceWorkspaceDevisRoute: typeof WorkspaceWorkspaceDevisRoute
-  WorkspaceWorkspaceEmployesRoute: typeof WorkspaceWorkspaceEmployesRoute
-  WorkspaceWorkspaceEntreesRoute: typeof WorkspaceWorkspaceEntreesRoute
-  WorkspaceWorkspaceFournisseursRoute: typeof WorkspaceWorkspaceFournisseursRoute
-  WorkspaceWorkspaceProduitsRoute: typeof WorkspaceWorkspaceProduitsRoute
-  WorkspaceWorkspaceRapportsRoute: typeof WorkspaceWorkspaceRapportsRoute
-  WorkspaceWorkspaceTransfertsRoute: typeof WorkspaceWorkspaceTransfertsRoute
-  WorkspaceWorkspaceVentesRoute: typeof WorkspaceWorkspaceVentesRoute
+  WorkspaceClientsRoute: typeof WorkspaceClientsRoute
+  WorkspaceComptabiliteRoute: typeof WorkspaceComptabiliteRoute
+  WorkspaceDashboardRoute: typeof WorkspaceDashboardRoute
+  WorkspaceDevisRoute: typeof WorkspaceDevisRoute
+  WorkspaceEmployesRoute: typeof WorkspaceEmployesRoute
+  WorkspaceEntreesRoute: typeof WorkspaceEntreesRoute
+  WorkspaceFournisseursRoute: typeof WorkspaceFournisseursRoute
+  WorkspaceProduitsRoute: typeof WorkspaceProduitsRoute
+  WorkspaceRapportsRoute: typeof WorkspaceRapportsRoute
+  WorkspaceTransfertsRoute: typeof WorkspaceTransfertsRoute
+  WorkspaceVentesRoute: typeof WorkspaceVentesRoute
 }
 
 const WorkspaceRouteChildren: WorkspaceRouteChildren = {
-  WorkspaceWorkspaceClientsRoute: WorkspaceWorkspaceClientsRoute,
-  WorkspaceWorkspaceComptabiliteRoute: WorkspaceWorkspaceComptabiliteRoute,
-  WorkspaceWorkspaceDashboardRoute: WorkspaceWorkspaceDashboardRoute,
-  WorkspaceWorkspaceDevisRoute: WorkspaceWorkspaceDevisRoute,
-  WorkspaceWorkspaceEmployesRoute: WorkspaceWorkspaceEmployesRoute,
-  WorkspaceWorkspaceEntreesRoute: WorkspaceWorkspaceEntreesRoute,
-  WorkspaceWorkspaceFournisseursRoute: WorkspaceWorkspaceFournisseursRoute,
-  WorkspaceWorkspaceProduitsRoute: WorkspaceWorkspaceProduitsRoute,
-  WorkspaceWorkspaceRapportsRoute: WorkspaceWorkspaceRapportsRoute,
-  WorkspaceWorkspaceTransfertsRoute: WorkspaceWorkspaceTransfertsRoute,
-  WorkspaceWorkspaceVentesRoute: WorkspaceWorkspaceVentesRoute,
+  WorkspaceClientsRoute: WorkspaceClientsRoute,
+  WorkspaceComptabiliteRoute: WorkspaceComptabiliteRoute,
+  WorkspaceDashboardRoute: WorkspaceDashboardRoute,
+  WorkspaceDevisRoute: WorkspaceDevisRoute,
+  WorkspaceEmployesRoute: WorkspaceEmployesRoute,
+  WorkspaceEntreesRoute: WorkspaceEntreesRoute,
+  WorkspaceFournisseursRoute: WorkspaceFournisseursRoute,
+  WorkspaceProduitsRoute: WorkspaceProduitsRoute,
+  WorkspaceRapportsRoute: WorkspaceRapportsRoute,
+  WorkspaceTransfertsRoute: WorkspaceTransfertsRoute,
+  WorkspaceVentesRoute: WorkspaceVentesRoute,
 }
 
 const WorkspaceRouteWithChildren = WorkspaceRoute._addFileChildren(
@@ -663,7 +658,6 @@ const WorkspaceRouteWithChildren = WorkspaceRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  WorkspaceRoute: WorkspaceRouteWithChildren,
   AppRoute: AppRoute,
   AuthRoute: AuthRoute,
   ClientsRoute: ClientsRoute,
@@ -681,6 +675,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   TransfertsRoute: TransfertsRoute,
   VenteRoute: VenteRoute,
+  WorkspaceRoute: WorkspaceRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
