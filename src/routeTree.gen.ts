@@ -32,6 +32,7 @@ import { Route as WorkspaceVentesRouteImport } from './routes/workspace.ventes'
 import { Route as WorkspaceTransfertsRouteImport } from './routes/workspace.transferts'
 import { Route as WorkspaceRapportsRouteImport } from './routes/workspace.rapports'
 import { Route as WorkspaceProduitsRouteImport } from './routes/workspace.produits'
+import { Route as WorkspaceParametresRouteImport } from './routes/workspace.parametres'
 import { Route as WorkspaceFournisseursRouteImport } from './routes/workspace.fournisseurs'
 import { Route as WorkspaceEntreesRouteImport } from './routes/workspace.entrees'
 import { Route as WorkspaceEmployesRouteImport } from './routes/workspace.employes'
@@ -155,6 +156,11 @@ const WorkspaceProduitsRoute = WorkspaceProduitsRouteImport.update({
   path: '/produits',
   getParentRoute: () => WorkspaceRoute,
 } as any)
+const WorkspaceParametresRoute = WorkspaceParametresRouteImport.update({
+  id: '/parametres',
+  path: '/parametres',
+  getParentRoute: () => WorkspaceRoute,
+} as any)
 const WorkspaceFournisseursRoute = WorkspaceFournisseursRouteImport.update({
   id: '/fournisseurs',
   path: '/fournisseurs',
@@ -218,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/workspace/employes': typeof WorkspaceEmployesRoute
   '/workspace/entrees': typeof WorkspaceEntreesRoute
   '/workspace/fournisseurs': typeof WorkspaceFournisseursRoute
+  '/workspace/parametres': typeof WorkspaceParametresRoute
   '/workspace/produits': typeof WorkspaceProduitsRoute
   '/workspace/rapports': typeof WorkspaceRapportsRoute
   '/workspace/transferts': typeof WorkspaceTransfertsRoute
@@ -250,6 +257,7 @@ export interface FileRoutesByTo {
   '/workspace/employes': typeof WorkspaceEmployesRoute
   '/workspace/entrees': typeof WorkspaceEntreesRoute
   '/workspace/fournisseurs': typeof WorkspaceFournisseursRoute
+  '/workspace/parametres': typeof WorkspaceParametresRoute
   '/workspace/produits': typeof WorkspaceProduitsRoute
   '/workspace/rapports': typeof WorkspaceRapportsRoute
   '/workspace/transferts': typeof WorkspaceTransfertsRoute
@@ -283,6 +291,7 @@ export interface FileRoutesById {
   '/workspace/employes': typeof WorkspaceEmployesRoute
   '/workspace/entrees': typeof WorkspaceEntreesRoute
   '/workspace/fournisseurs': typeof WorkspaceFournisseursRoute
+  '/workspace/parametres': typeof WorkspaceParametresRoute
   '/workspace/produits': typeof WorkspaceProduitsRoute
   '/workspace/rapports': typeof WorkspaceRapportsRoute
   '/workspace/transferts': typeof WorkspaceTransfertsRoute
@@ -317,6 +326,7 @@ export interface FileRouteTypes {
     | '/workspace/employes'
     | '/workspace/entrees'
     | '/workspace/fournisseurs'
+    | '/workspace/parametres'
     | '/workspace/produits'
     | '/workspace/rapports'
     | '/workspace/transferts'
@@ -349,6 +359,7 @@ export interface FileRouteTypes {
     | '/workspace/employes'
     | '/workspace/entrees'
     | '/workspace/fournisseurs'
+    | '/workspace/parametres'
     | '/workspace/produits'
     | '/workspace/rapports'
     | '/workspace/transferts'
@@ -381,6 +392,7 @@ export interface FileRouteTypes {
     | '/workspace/employes'
     | '/workspace/entrees'
     | '/workspace/fournisseurs'
+    | '/workspace/parametres'
     | '/workspace/produits'
     | '/workspace/rapports'
     | '/workspace/transferts'
@@ -572,6 +584,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkspaceProduitsRouteImport
       parentRoute: typeof WorkspaceRoute
     }
+    '/workspace/parametres': {
+      id: '/workspace/parametres'
+      path: '/parametres'
+      fullPath: '/workspace/parametres'
+      preLoaderRoute: typeof WorkspaceParametresRouteImport
+      parentRoute: typeof WorkspaceRoute
+    }
     '/workspace/fournisseurs': {
       id: '/workspace/fournisseurs'
       path: '/fournisseurs'
@@ -632,6 +651,7 @@ interface WorkspaceRouteChildren {
   WorkspaceEmployesRoute: typeof WorkspaceEmployesRoute
   WorkspaceEntreesRoute: typeof WorkspaceEntreesRoute
   WorkspaceFournisseursRoute: typeof WorkspaceFournisseursRoute
+  WorkspaceParametresRoute: typeof WorkspaceParametresRoute
   WorkspaceProduitsRoute: typeof WorkspaceProduitsRoute
   WorkspaceRapportsRoute: typeof WorkspaceRapportsRoute
   WorkspaceTransfertsRoute: typeof WorkspaceTransfertsRoute
@@ -646,6 +666,7 @@ const WorkspaceRouteChildren: WorkspaceRouteChildren = {
   WorkspaceEmployesRoute: WorkspaceEmployesRoute,
   WorkspaceEntreesRoute: WorkspaceEntreesRoute,
   WorkspaceFournisseursRoute: WorkspaceFournisseursRoute,
+  WorkspaceParametresRoute: WorkspaceParametresRoute,
   WorkspaceProduitsRoute: WorkspaceProduitsRoute,
   WorkspaceRapportsRoute: WorkspaceRapportsRoute,
   WorkspaceTransfertsRoute: WorkspaceTransfertsRoute,

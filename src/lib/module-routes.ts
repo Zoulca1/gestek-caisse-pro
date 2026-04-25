@@ -1,7 +1,7 @@
 import type { ModuleKey } from "@/lib/tenant";
 import {
   LayoutDashboard, ShoppingCart, Package, Truck, ArrowRightLeft, Users, Building2,
-  BarChart3, Calculator, FileText, Users2, type LucideIcon,
+  BarChart3, Calculator, FileText, Users2, Settings, type LucideIcon,
 } from "lucide-react";
 
 export interface ModuleNavItem {
@@ -24,6 +24,7 @@ export const CLOUD_NAV: ModuleNavItem[] = [
   { to: "/workspace/employes", label: "Employés", icon: Users2, module: "employes" },
   { to: "/workspace/comptabilite", label: "Comptabilité", icon: Calculator, module: "comptabilite" },
   { to: "/workspace/rapports", label: "Rapports", icon: BarChart3, module: "rapports" },
+  { to: "/workspace/parametres", label: "Paramètres", icon: Settings, module: null },
 ];
 
 /** Map a workspace path to the module it requires. */
