@@ -60,9 +60,18 @@ function OnboardingPage() {
   };
 
   const handleCreate = async () => {
-    if (!user) return;
     setSubmitting(true);
     try {
+      // 0. Verify session is hydrated and JWT is attached
+      const { data: { session }, error: sErr } = await supabase.auth.getSession();
+      if (sErr) throw sErr;
+      if (!session?.user) {
+        toast.error("Session expirée. Veuillez vous reconnecter.");
+        navigate({ to: "/auth" });
+        return;
+      }
+      const userId = session.user.id;
+
       // 1. Create tenant
       const slug = companyName.toLowerCase().trim()
         .replace(/[^a-z0-9]+/g, "-")
@@ -77,7 +86,7 @@ function OnboardingPage() {
           activity_type: activity,
           country,
           currency,
-          owner_id: user.id,
+          owner_id: userId,
           onboarded: true,
         })
         .select()
@@ -86,7 +95,7 @@ function OnboardingPage() {
 
       // 2. Add owner role
       const { error: rErr } = await supabase.from("user_roles").insert({
-        user_id: user.id,
+        user_id: userId,
         tenant_id: tenant.id,
         role: "owner",
       });
@@ -94,7 +103,7 @@ function OnboardingPage() {
 
       // 3. Add membership
       const { error: mErr } = await supabase.from("tenant_members").insert({
-        user_id: user.id,
+        user_id: userId,
         tenant_id: tenant.id,
       });
       if (mErr) throw mErr;
@@ -115,7 +124,13 @@ function OnboardingPage() {
       setStep(4);
       toast.success("Entreprise créée !");
     } catch (err: any) {
-      toast.error(err.message ?? "Erreur lors de la création");
+      console.error("[onboarding] create tenant failed:", err);
+      const msg = err?.message ?? "";
+      if (err?.code === "42501" || /row-level security|violates/i.test(msg)) {
+        toast.error("Session expirée ou accès refusé. Reconnectez-vous puis réessayez.");
+      } else {
+        toast.error(msg || "Erreur lors de la création de l'entreprise");
+      }
     } finally {
       setSubmitting(false);
     }
