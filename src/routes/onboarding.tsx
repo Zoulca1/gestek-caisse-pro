@@ -70,57 +70,25 @@ function OnboardingPage() {
         navigate({ to: "/auth" });
         return;
       }
-      const userId = session.user.id;
-
-      // 1. Create tenant
+      // Atomic creation via SECURITY DEFINER RPC (handles tenant + role + membership + modules in 1 transaction)
       const slug = companyName.toLowerCase().trim()
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "")
         .slice(0, 40) + "-" + Math.random().toString(36).slice(2, 6);
 
-      const { data: tenant, error: tErr } = await supabase
-        .from("tenants")
-        .insert({
-          name: companyName.trim(),
-          slug,
-          activity_type: activity,
-          country,
-          currency,
-          owner_id: userId,
-          onboarded: true,
-        })
-        .select()
-        .single();
-      if (tErr) throw tErr;
-
-      // 2. Add owner role
-      const { error: rErr } = await supabase.from("user_roles").insert({
-        user_id: userId,
-        tenant_id: tenant.id,
-        role: "owner",
+      const { data: tenantId, error: rpcErr } = await supabase.rpc("create_tenant_with_owner", {
+        _name: companyName.trim(),
+        _slug: slug,
+        _activity: activity,
+        _country: country,
+        _currency: currency,
+        _modules: Array.from(modules),
       });
-      if (rErr) throw rErr;
+      if (rpcErr) throw rpcErr;
+      if (!tenantId) throw new Error("Création échouée");
 
-      // 3. Add membership
-      const { error: mErr } = await supabase.from("tenant_members").insert({
-        user_id: userId,
-        tenant_id: tenant.id,
-      });
-      if (mErr) throw mErr;
-
-      // 4. Insert modules
-      const moduleRows = Array.from(modules).map((m) => ({
-        tenant_id: tenant.id,
-        module: m,
-        enabled: true,
-      }));
-      if (moduleRows.length > 0) {
-        const { error: modErr } = await supabase.from("tenant_modules").insert(moduleRows);
-        if (modErr) throw modErr;
-      }
-
-      setCreatedTenantName(tenant.name);
-      setActiveTenant(tenant.id);
+      setCreatedTenantName(companyName.trim());
+      setActiveTenant(tenantId as string);
       setStep(4);
       toast.success("Entreprise créée !");
     } catch (err: any) {
