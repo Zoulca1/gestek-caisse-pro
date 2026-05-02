@@ -37,7 +37,7 @@ function AuthPage() {
     setLoading(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -46,8 +46,12 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        toast.success("Compte créé ! Vérifiez votre email pour confirmer.");
-        navigate({ to: "/app" });
+        if (data.session) {
+          toast.success("Compte créé ! Bienvenue sur GESTEK.");
+          navigate({ to: "/onboarding" });
+        } else {
+          toast.success("Compte créé ! Vérifiez votre email pour confirmer.");
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -55,6 +59,7 @@ function AuthPage() {
         navigate({ to: "/app" });
       }
     } catch (err: any) {
+      console.error("[auth] error:", err);
       toast.error(err.message ?? "Erreur d'authentification");
     } finally {
       setLoading(false);
