@@ -698,6 +698,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_tenant_with_owner: {
+        Args: {
+          _activity: Database["public"]["Enums"]["activity_type"]
+          _country: string
+          _currency: string
+          _modules: Database["public"]["Enums"]["module_key"][]
+          _name: string
+          _slug: string
+        }
+        Returns: string
+      }
       has_tenant_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
