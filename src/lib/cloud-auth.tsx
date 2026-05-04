@@ -16,14 +16,24 @@ export function CloudAuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 1. Listener FIRST
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
+    let currentUserId: string | null = null;
+
+    // 1. Listener FIRST — but ignore events that don't change the user
+    // (TOKEN_REFRESHED on tab focus would otherwise trigger a full app re-render)
+    const { data: sub } = supabase.auth.onAuthStateChange((event, newSession) => {
+      const newUserId = newSession?.user?.id ?? null;
+      if (event === "TOKEN_REFRESHED" && newUserId === currentUserId) {
+        // Same user, just a token refresh — do not re-trigger downstream effects
+        return;
+      }
+      currentUserId = newUserId;
       setSession(newSession);
       setLoading(false);
     });
 
     // 2. THEN getSession
     supabase.auth.getSession().then(({ data }) => {
+      currentUserId = data.session?.user?.id ?? null;
       setSession(data.session);
       setLoading(false);
     });
