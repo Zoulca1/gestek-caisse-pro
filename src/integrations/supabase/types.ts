@@ -619,45 +619,84 @@ export type Database = {
       tenants: {
         Row: {
           activity_type: Database["public"]["Enums"]["activity_type"]
+          address: string | null
+          bank_info: string | null
+          cc_number: string | null
+          city: string | null
           country: string | null
+          country_full: string | null
           created_at: string
           currency: string
+          email_company: string | null
           id: string
+          invoice_footer: string | null
+          invoice_prefix: string | null
+          logo_url: string | null
           name: string
           onboarded: boolean
           owner_id: string
+          phone_company: string | null
           plan: Database["public"]["Enums"]["subscription_plan"]
+          signature_url: string | null
           slug: string | null
+          tax_id: string | null
           trial_ends_at: string | null
           updated_at: string
+          website: string | null
         }
         Insert: {
           activity_type?: Database["public"]["Enums"]["activity_type"]
+          address?: string | null
+          bank_info?: string | null
+          cc_number?: string | null
+          city?: string | null
           country?: string | null
+          country_full?: string | null
           created_at?: string
           currency?: string
+          email_company?: string | null
           id?: string
+          invoice_footer?: string | null
+          invoice_prefix?: string | null
+          logo_url?: string | null
           name: string
           onboarded?: boolean
           owner_id: string
+          phone_company?: string | null
           plan?: Database["public"]["Enums"]["subscription_plan"]
+          signature_url?: string | null
           slug?: string | null
+          tax_id?: string | null
           trial_ends_at?: string | null
           updated_at?: string
+          website?: string | null
         }
         Update: {
           activity_type?: Database["public"]["Enums"]["activity_type"]
+          address?: string | null
+          bank_info?: string | null
+          cc_number?: string | null
+          city?: string | null
           country?: string | null
+          country_full?: string | null
           created_at?: string
           currency?: string
+          email_company?: string | null
           id?: string
+          invoice_footer?: string | null
+          invoice_prefix?: string | null
+          logo_url?: string | null
           name?: string
           onboarded?: boolean
           owner_id?: string
+          phone_company?: string | null
           plan?: Database["public"]["Enums"]["subscription_plan"]
+          signature_url?: string | null
           slug?: string | null
+          tax_id?: string | null
           trial_ends_at?: string | null
           updated_at?: string
+          website?: string | null
         }
         Relationships: []
       }
