@@ -3,8 +3,9 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCloudAuth } from "@/lib/cloud-auth";
 import { useTenant } from "@/lib/tenant";
-import { Loader2, Plus, Minus, Trash2, Search, ShoppingCart, X, Receipt } from "lucide-react";
+import { Loader2, Plus, Minus, Trash2, Search, ShoppingCart, X, Receipt, FileDown } from "lucide-react";
 import { toast } from "sonner";
+import { generateInvoiceForSale } from "@/lib/invoice-pdf";
 
 export const Route = createFileRoute("/workspace/ventes")({
   component: SalesCloud,
@@ -101,6 +102,22 @@ function SalesCloud() {
     setCart([]); setCustomerId(""); setShowCart(false);
     load();
     setSaving(false);
+
+    // Auto-generate invoice PDF after sale
+    try {
+      await generateInvoiceForSale(sale.id, tenant.id);
+    } catch (err: any) {
+      toast.error("Facture PDF : " + (err?.message || "erreur"));
+    }
+  };
+
+  const downloadInvoice = async (saleId: string) => {
+    if (!tenant) return;
+    try {
+      await generateInvoiceForSale(saleId, tenant.id);
+    } catch (err: any) {
+      toast.error(err?.message || "Erreur lors de la génération du PDF");
+    }
   };
 
   return (
@@ -157,7 +174,13 @@ function SalesCloud() {
           <div className="overflow-x-auto rounded-xl border border-border">
             <table className="w-full text-sm">
               <thead className="bg-muted/50 text-xs uppercase tracking-wider text-muted-foreground">
-                <tr><th className="text-left px-4 py-2.5">Référence</th><th className="text-left px-4 py-2.5">Date</th><th className="text-left px-4 py-2.5">Paiement</th><th className="text-right px-4 py-2.5">Total</th></tr>
+                <tr>
+                  <th className="text-left px-4 py-2.5">Référence</th>
+                  <th className="text-left px-4 py-2.5">Date</th>
+                  <th className="text-left px-4 py-2.5">Paiement</th>
+                  <th className="text-right px-4 py-2.5">Total</th>
+                  <th className="text-right px-4 py-2.5">Facture</th>
+                </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {recent.map((s) => (
@@ -166,6 +189,15 @@ function SalesCloud() {
                     <td className="px-4 py-2.5">{new Date(s.sold_at).toLocaleString("fr-FR")}</td>
                     <td className="px-4 py-2.5 capitalize">{s.payment_method}</td>
                     <td className="px-4 py-2.5 text-right tabular-nums font-semibold">{fmt(Number(s.total))}</td>
+                    <td className="px-4 py-2.5 text-right">
+                      <button
+                        onClick={() => downloadInvoice(s.id)}
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10 text-primary hover:bg-primary/20 text-xs font-semibold"
+                        title="Télécharger la facture PDF"
+                      >
+                        <FileDown className="h-3.5 w-3.5" /> PDF
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
