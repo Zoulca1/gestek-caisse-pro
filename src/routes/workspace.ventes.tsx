@@ -3,8 +3,9 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCloudAuth } from "@/lib/cloud-auth";
 import { useTenant } from "@/lib/tenant";
-import { Loader2, Plus, Minus, Trash2, Search, ShoppingCart, X, Receipt } from "lucide-react";
+import { Loader2, Plus, Minus, Trash2, Search, ShoppingCart, X, Receipt, FileDown } from "lucide-react";
 import { toast } from "sonner";
+import { generateInvoiceForSale } from "@/lib/invoice-pdf";
 
 export const Route = createFileRoute("/workspace/ventes")({
   component: SalesCloud,
