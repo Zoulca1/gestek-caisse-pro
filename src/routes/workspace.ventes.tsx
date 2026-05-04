@@ -174,7 +174,13 @@ function SalesCloud() {
           <div className="overflow-x-auto rounded-xl border border-border">
             <table className="w-full text-sm">
               <thead className="bg-muted/50 text-xs uppercase tracking-wider text-muted-foreground">
-                <tr><th className="text-left px-4 py-2.5">Référence</th><th className="text-left px-4 py-2.5">Date</th><th className="text-left px-4 py-2.5">Paiement</th><th className="text-right px-4 py-2.5">Total</th></tr>
+                <tr>
+                  <th className="text-left px-4 py-2.5">Référence</th>
+                  <th className="text-left px-4 py-2.5">Date</th>
+                  <th className="text-left px-4 py-2.5">Paiement</th>
+                  <th className="text-right px-4 py-2.5">Total</th>
+                  <th className="text-right px-4 py-2.5">Facture</th>
+                </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {recent.map((s) => (
@@ -183,6 +189,15 @@ function SalesCloud() {
                     <td className="px-4 py-2.5">{new Date(s.sold_at).toLocaleString("fr-FR")}</td>
                     <td className="px-4 py-2.5 capitalize">{s.payment_method}</td>
                     <td className="px-4 py-2.5 text-right tabular-nums font-semibold">{fmt(Number(s.total))}</td>
+                    <td className="px-4 py-2.5 text-right">
+                      <button
+                        onClick={() => downloadInvoice(s.id)}
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10 text-primary hover:bg-primary/20 text-xs font-semibold"
+                        title="Télécharger la facture PDF"
+                      >
+                        <FileDown className="h-3.5 w-3.5" /> PDF
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
