@@ -102,6 +102,22 @@ function SalesCloud() {
     setCart([]); setCustomerId(""); setShowCart(false);
     load();
     setSaving(false);
+
+    // Auto-generate invoice PDF after sale
+    try {
+      await generateInvoiceForSale(sale.id, tenant.id);
+    } catch (err: any) {
+      toast.error("Facture PDF : " + (err?.message || "erreur"));
+    }
+  };
+
+  const downloadInvoice = async (saleId: string) => {
+    if (!tenant) return;
+    try {
+      await generateInvoiceForSale(saleId, tenant.id);
+    } catch (err: any) {
+      toast.error(err?.message || "Erreur lors de la génération du PDF");
+    }
   };
 
   return (
