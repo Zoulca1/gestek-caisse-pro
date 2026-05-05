@@ -1,10 +1,8 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
-import { AuthProvider } from "@/lib/auth";
 import { CloudAuthProvider } from "@/lib/cloud-auth";
 import { TenantProvider } from "@/lib/tenant";
 import { ThemeProvider } from "@/lib/theme";
-import { DataProvider } from "@/lib/store";
 
 import appCss from "../styles.css?url";
 
@@ -72,12 +70,8 @@ function RootComponent() {
     <ThemeProvider>
       <CloudAuthProvider>
         <TenantProvider>
-          <AuthProvider>
-            <DataProvider>
-              <Outlet />
-              <Toaster richColors position="top-right" />
-            </DataProvider>
-          </AuthProvider>
+          <Outlet />
+          <Toaster richColors position="top-right" />
         </TenantProvider>
       </CloudAuthProvider>
     </ThemeProvider>
