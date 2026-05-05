@@ -1,1 +1,3 @@
 project_id = "zqnwekojecavmaashbrl"
+[functions.demo-setup]
+verify_jwt = false
