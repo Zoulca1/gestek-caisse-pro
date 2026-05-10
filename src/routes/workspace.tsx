@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2, LogOut, Menu, X, Moon, Sun, Building2, ChevronDown, AlertTriangle } from "lucide-react";
+import { Loader2, LogOut, Menu, X, Moon, Sun, Building2, ChevronDown, AlertTriangle, Sparkles } from "lucide-react";
 import { useCloudAuth } from "@/lib/cloud-auth";
 import { useTenant } from "@/lib/tenant";
 import { useTheme } from "@/lib/theme";
@@ -46,6 +46,7 @@ function WorkspaceLayout() {
   const moduleBlocked = requiredModule !== null && !hasModule(requiredModule);
 
   const visibleNav = CLOUD_NAV.filter((n) => n.module === null || modules.has(n.module));
+  const isDemoUser = !!user.email && user.email.startsWith("demo-") && user.email.endsWith("@gestek.app");
 
   const handleSignOut = async () => {
     clear();
@@ -124,6 +125,17 @@ function WorkspaceLayout() {
       )}
 
       <div className="flex-1 flex flex-col min-w-0">
+        {isDemoUser && (
+          <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-2 text-xs md:text-sm flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <Sparkles className="h-4 w-4 shrink-0" />
+              <span className="truncate"><strong>Mode démo</strong> — données partagées, visibles par d'autres visiteurs.</span>
+            </div>
+            <button onClick={handleSignOut} className="shrink-0 inline-flex items-center gap-1 rounded-md bg-white/20 hover:bg-white/30 px-2.5 py-1 font-semibold transition">
+              Quitter <LogOut className="h-3 w-3" />
+            </button>
+          </div>
+        )}
         <header className="sticky top-0 z-30 flex items-center justify-between gap-3 px-4 md:px-6 py-3 bg-card border-b border-border">
           <div className="flex items-center gap-3 min-w-0">
             <button className="md:hidden p-2 -ml-2" onClick={() => setMobileOpen(true)}>

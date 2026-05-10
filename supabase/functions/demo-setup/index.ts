@@ -141,23 +141,79 @@ Deno.serve(async (req) => {
       ]);
 
       // Sales over last 30 days
-      const sales = [];
+      const sales: any[] = [];
       const methods = ["especes","mobile_money","carte","credit"];
       for (let i = 1; i <= 120; i++) {
         const daysAgo = Math.floor(Math.random() * 30);
         const hoursAgo = Math.floor(Math.random() * 8);
         const d = new Date(); d.setDate(d.getDate() - daysAgo); d.setHours(d.getHours() - hoursAgo);
-        const total = 1500 + Math.floor(Math.random() * 45000);
         sales.push({
           tenant_id: TENANT_ID,
           reference: `V-DEMO-${String(i).padStart(4, "0")}`,
           sold_at: d.toISOString(),
-          subtotal: total, total,
+          subtotal: 0, total: 0,
           payment_method: methods[Math.floor(Math.random()*4)],
           status: "completed",
         });
       }
-      await admin.from("sales").insert(sales);
+      const { data: insertedSales } = await admin.from("sales").insert(sales).select("id");
+
+      // Fetch products to build sale_items
+      const { data: prodRows } = await admin.from("products").select("id,name,sale_price").eq("tenant_id", TENANT_ID);
+      if (insertedSales && prodRows && prodRows.length) {
+        const items: any[] = [];
+        const updates: { id: string; subtotal: number; total: number }[] = [];
+        for (const s of insertedSales) {
+          const lineCount = 1 + Math.floor(Math.random() * 4);
+          let subtotal = 0;
+          for (let k = 0; k < lineCount; k++) {
+            const p = prodRows[Math.floor(Math.random() * prodRows.length)];
+            const qty = 1 + Math.floor(Math.random() * 5);
+            const lineTotal = Number(p.sale_price) * qty;
+            subtotal += lineTotal;
+            items.push({
+              tenant_id: TENANT_ID, sale_id: s.id, product_id: p.id,
+              product_name: p.name, quantity: qty, unit_price: p.sale_price, line_total: lineTotal,
+            });
+          }
+          updates.push({ id: s.id, subtotal, total: subtotal });
+        }
+        if (items.length) await admin.from("sale_items").insert(items);
+        for (const u of updates) {
+          await admin.from("sales").update({ subtotal: u.subtotal, total: u.total }).eq("id", u.id);
+        }
+      }
+
+      // Quotes
+      const { data: customerRows } = await admin.from("customers").select("id,name").eq("tenant_id", TENANT_ID).limit(5);
+      if (customerRows && prodRows && prodRows.length) {
+        const quotes: any[] = [];
+        const statuses = ["draft", "sent", "accepted", "expired"];
+        for (let i = 1; i <= 8; i++) {
+          const c = customerRows[i % customerRows.length];
+          const lineCount = 2 + Math.floor(Math.random() * 4);
+          const qItems: any[] = [];
+          let subtotal = 0;
+          for (let k = 0; k < lineCount; k++) {
+            const p = prodRows[Math.floor(Math.random() * prodRows.length)];
+            const qty = 1 + Math.floor(Math.random() * 8);
+            const lt = Number(p.sale_price) * qty;
+            subtotal += lt;
+            qItems.push({ product_id: p.id, product_name: p.name, quantity: qty, unit_price: p.sale_price, line_total: lt });
+          }
+          const validUntil = new Date(); validUntil.setDate(validUntil.getDate() + 14);
+          quotes.push({
+            tenant_id: TENANT_ID,
+            reference: `DEV-DEMO-${String(i).padStart(3, "0")}`,
+            customer_id: c.id, customer_name: c.name,
+            items: qItems, subtotal, tax: 0, discount: 0, total: subtotal,
+            status: statuses[i % statuses.length],
+            valid_until: validUntil.toISOString().slice(0, 10),
+            notes: "Devis de démonstration",
+          });
+        }
+        await admin.from("quotes").insert(quotes);
+      }
 
       const today = new Date();
       const dateMinus = (n: number) => { const d = new Date(today); d.setDate(d.getDate() - n); return d.toISOString().slice(0,10); };
@@ -170,6 +226,78 @@ Deno.serve(async (req) => {
         { tenant_id: TENANT_ID, entry_date: dateMinus(20), entry_type: "expense", label: "Carburant livraisons", category: "Transport", amount: 18000, payment_method: "especes" },
         { tenant_id: TENANT_ID, entry_date: dateMinus(25), entry_type: "expense", label: "Forfait internet boutique", category: "Charges", amount: 25000, payment_method: "mobile_money" },
       ]);
+    }
+
+    // 6. Backfill: ensure sale_items exist for each sale (idempotent top-up)
+    const { count: itemCount } = await admin
+      .from("sale_items").select("*", { count: "exact", head: true }).eq("tenant_id", TENANT_ID);
+    if (!itemCount || itemCount === 0) {
+      const { data: salesAll } = await admin.from("sales").select("id").eq("tenant_id", TENANT_ID);
+      const { data: prodAll } = await admin.from("products").select("id,name,sale_price").eq("tenant_id", TENANT_ID);
+      if (salesAll?.length && prodAll?.length) {
+        const items: any[] = [];
+        const updates: { id: string; total: number }[] = [];
+        for (const s of salesAll) {
+          const lineCount = 1 + Math.floor(Math.random() * 4);
+          let subtotal = 0;
+          for (let k = 0; k < lineCount; k++) {
+            const p = prodAll[Math.floor(Math.random() * prodAll.length)];
+            const qty = 1 + Math.floor(Math.random() * 5);
+            const lt = Number(p.sale_price) * qty;
+            subtotal += lt;
+            items.push({
+              tenant_id: TENANT_ID, sale_id: s.id, product_id: p.id,
+              product_name: p.name, quantity: qty, unit_price: p.sale_price, line_total: lt,
+            });
+          }
+          updates.push({ id: s.id, total: subtotal });
+        }
+        if (items.length) {
+          // chunk inserts (Supabase ~1000 row limit safe)
+          for (let i = 0; i < items.length; i += 500) {
+            await admin.from("sale_items").insert(items.slice(i, i + 500));
+          }
+        }
+        for (const u of updates) {
+          await admin.from("sales").update({ subtotal: u.total, total: u.total }).eq("id", u.id);
+        }
+      }
+    }
+
+    // 7. Backfill: ensure quotes exist
+    const { count: quoteCount } = await admin
+      .from("quotes").select("*", { count: "exact", head: true }).eq("tenant_id", TENANT_ID);
+    if (!quoteCount || quoteCount === 0) {
+      const { data: customerRows } = await admin.from("customers").select("id,name").eq("tenant_id", TENANT_ID).limit(5);
+      const { data: prodAll } = await admin.from("products").select("id,name,sale_price").eq("tenant_id", TENANT_ID);
+      if (customerRows?.length && prodAll?.length) {
+        const quotes: any[] = [];
+        const statuses = ["draft", "sent", "accepted", "expired"];
+        for (let i = 1; i <= 8; i++) {
+          const c = customerRows[i % customerRows.length];
+          const lineCount = 2 + Math.floor(Math.random() * 4);
+          const qItems: any[] = [];
+          let subtotal = 0;
+          for (let k = 0; k < lineCount; k++) {
+            const p = prodAll[Math.floor(Math.random() * prodAll.length)];
+            const qty = 1 + Math.floor(Math.random() * 8);
+            const lt = Number(p.sale_price) * qty;
+            subtotal += lt;
+            qItems.push({ product_id: p.id, product_name: p.name, quantity: qty, unit_price: p.sale_price, line_total: lt });
+          }
+          const validUntil = new Date(); validUntil.setDate(validUntil.getDate() + 14);
+          quotes.push({
+            tenant_id: TENANT_ID,
+            reference: `DEV-DEMO-${String(i).padStart(3, "0")}`,
+            customer_id: c.id, customer_name: c.name,
+            items: qItems, subtotal, tax: 0, discount: 0, total: subtotal,
+            status: statuses[i % statuses.length],
+            valid_until: validUntil.toISOString().slice(0, 10),
+            notes: "Devis de démonstration",
+          });
+        }
+        await admin.from("quotes").insert(quotes);
+      }
     }
 
     return new Response(JSON.stringify({ ok: true, tenant_id: TENANT_ID, users: DEMO_USERS.map(u => ({ email: u.email, role: u.role })) }), {
