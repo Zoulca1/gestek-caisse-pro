@@ -228,6 +228,78 @@ Deno.serve(async (req) => {
       ]);
     }
 
+    // 6. Backfill: ensure sale_items exist for each sale (idempotent top-up)
+    const { count: itemCount } = await admin
+      .from("sale_items").select("*", { count: "exact", head: true }).eq("tenant_id", TENANT_ID);
+    if (!itemCount || itemCount === 0) {
+      const { data: salesAll } = await admin.from("sales").select("id").eq("tenant_id", TENANT_ID);
+      const { data: prodAll } = await admin.from("products").select("id,name,sale_price").eq("tenant_id", TENANT_ID);
+      if (salesAll?.length && prodAll?.length) {
+        const items: any[] = [];
+        const updates: { id: string; total: number }[] = [];
+        for (const s of salesAll) {
+          const lineCount = 1 + Math.floor(Math.random() * 4);
+          let subtotal = 0;
+          for (let k = 0; k < lineCount; k++) {
+            const p = prodAll[Math.floor(Math.random() * prodAll.length)];
+            const qty = 1 + Math.floor(Math.random() * 5);
+            const lt = Number(p.sale_price) * qty;
+            subtotal += lt;
+            items.push({
+              tenant_id: TENANT_ID, sale_id: s.id, product_id: p.id,
+              product_name: p.name, quantity: qty, unit_price: p.sale_price, line_total: lt,
+            });
+          }
+          updates.push({ id: s.id, total: subtotal });
+        }
+        if (items.length) {
+          // chunk inserts (Supabase ~1000 row limit safe)
+          for (let i = 0; i < items.length; i += 500) {
+            await admin.from("sale_items").insert(items.slice(i, i + 500));
+          }
+        }
+        for (const u of updates) {
+          await admin.from("sales").update({ subtotal: u.total, total: u.total }).eq("id", u.id);
+        }
+      }
+    }
+
+    // 7. Backfill: ensure quotes exist
+    const { count: quoteCount } = await admin
+      .from("quotes").select("*", { count: "exact", head: true }).eq("tenant_id", TENANT_ID);
+    if (!quoteCount || quoteCount === 0) {
+      const { data: customerRows } = await admin.from("customers").select("id,name").eq("tenant_id", TENANT_ID).limit(5);
+      const { data: prodAll } = await admin.from("products").select("id,name,sale_price").eq("tenant_id", TENANT_ID);
+      if (customerRows?.length && prodAll?.length) {
+        const quotes: any[] = [];
+        const statuses = ["draft", "sent", "accepted", "expired"];
+        for (let i = 1; i <= 8; i++) {
+          const c = customerRows[i % customerRows.length];
+          const lineCount = 2 + Math.floor(Math.random() * 4);
+          const qItems: any[] = [];
+          let subtotal = 0;
+          for (let k = 0; k < lineCount; k++) {
+            const p = prodAll[Math.floor(Math.random() * prodAll.length)];
+            const qty = 1 + Math.floor(Math.random() * 8);
+            const lt = Number(p.sale_price) * qty;
+            subtotal += lt;
+            qItems.push({ product_id: p.id, product_name: p.name, quantity: qty, unit_price: p.sale_price, line_total: lt });
+          }
+          const validUntil = new Date(); validUntil.setDate(validUntil.getDate() + 14);
+          quotes.push({
+            tenant_id: TENANT_ID,
+            reference: `DEV-DEMO-${String(i).padStart(3, "0")}`,
+            customer_id: c.id, customer_name: c.name,
+            items: qItems, subtotal, tax: 0, discount: 0, total: subtotal,
+            status: statuses[i % statuses.length],
+            valid_until: validUntil.toISOString().slice(0, 10),
+            notes: "Devis de démonstration",
+          });
+        }
+        await admin.from("quotes").insert(quotes);
+      }
+    }
+
     return new Response(JSON.stringify({ ok: true, tenant_id: TENANT_ID, users: DEMO_USERS.map(u => ({ email: u.email, role: u.role })) }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
