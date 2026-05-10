@@ -141,23 +141,79 @@ Deno.serve(async (req) => {
       ]);
 
       // Sales over last 30 days
-      const sales = [];
+      const sales: any[] = [];
       const methods = ["especes","mobile_money","carte","credit"];
       for (let i = 1; i <= 120; i++) {
         const daysAgo = Math.floor(Math.random() * 30);
         const hoursAgo = Math.floor(Math.random() * 8);
         const d = new Date(); d.setDate(d.getDate() - daysAgo); d.setHours(d.getHours() - hoursAgo);
-        const total = 1500 + Math.floor(Math.random() * 45000);
         sales.push({
           tenant_id: TENANT_ID,
           reference: `V-DEMO-${String(i).padStart(4, "0")}`,
           sold_at: d.toISOString(),
-          subtotal: total, total,
+          subtotal: 0, total: 0,
           payment_method: methods[Math.floor(Math.random()*4)],
           status: "completed",
         });
       }
-      await admin.from("sales").insert(sales);
+      const { data: insertedSales } = await admin.from("sales").insert(sales).select("id");
+
+      // Fetch products to build sale_items
+      const { data: prodRows } = await admin.from("products").select("id,name,sale_price").eq("tenant_id", TENANT_ID);
+      if (insertedSales && prodRows && prodRows.length) {
+        const items: any[] = [];
+        const updates: { id: string; subtotal: number; total: number }[] = [];
+        for (const s of insertedSales) {
+          const lineCount = 1 + Math.floor(Math.random() * 4);
+          let subtotal = 0;
+          for (let k = 0; k < lineCount; k++) {
+            const p = prodRows[Math.floor(Math.random() * prodRows.length)];
+            const qty = 1 + Math.floor(Math.random() * 5);
+            const lineTotal = Number(p.sale_price) * qty;
+            subtotal += lineTotal;
+            items.push({
+              tenant_id: TENANT_ID, sale_id: s.id, product_id: p.id,
+              product_name: p.name, quantity: qty, unit_price: p.sale_price, line_total: lineTotal,
+            });
+          }
+          updates.push({ id: s.id, subtotal, total: subtotal });
+        }
+        if (items.length) await admin.from("sale_items").insert(items);
+        for (const u of updates) {
+          await admin.from("sales").update({ subtotal: u.subtotal, total: u.total }).eq("id", u.id);
+        }
+      }
+
+      // Quotes
+      const { data: customerRows } = await admin.from("customers").select("id,name").eq("tenant_id", TENANT_ID).limit(5);
+      if (customerRows && prodRows && prodRows.length) {
+        const quotes: any[] = [];
+        const statuses = ["draft", "sent", "accepted", "expired"];
+        for (let i = 1; i <= 8; i++) {
+          const c = customerRows[i % customerRows.length];
+          const lineCount = 2 + Math.floor(Math.random() * 4);
+          const qItems: any[] = [];
+          let subtotal = 0;
+          for (let k = 0; k < lineCount; k++) {
+            const p = prodRows[Math.floor(Math.random() * prodRows.length)];
+            const qty = 1 + Math.floor(Math.random() * 8);
+            const lt = Number(p.sale_price) * qty;
+            subtotal += lt;
+            qItems.push({ product_id: p.id, product_name: p.name, quantity: qty, unit_price: p.sale_price, line_total: lt });
+          }
+          const validUntil = new Date(); validUntil.setDate(validUntil.getDate() + 14);
+          quotes.push({
+            tenant_id: TENANT_ID,
+            reference: `DEV-DEMO-${String(i).padStart(3, "0")}`,
+            customer_id: c.id, customer_name: c.name,
+            items: qItems, subtotal, tax: 0, discount: 0, total: subtotal,
+            status: statuses[i % statuses.length],
+            valid_until: validUntil.toISOString().slice(0, 10),
+            notes: "Devis de démonstration",
+          });
+        }
+        await admin.from("quotes").insert(quotes);
+      }
 
       const today = new Date();
       const dateMinus = (n: number) => { const d = new Date(today); d.setDate(d.getDate() - n); return d.toISOString().slice(0,10); };
