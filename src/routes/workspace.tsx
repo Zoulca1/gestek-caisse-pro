@@ -46,6 +46,7 @@ function WorkspaceLayout() {
   const moduleBlocked = requiredModule !== null && !hasModule(requiredModule);
 
   const visibleNav = CLOUD_NAV.filter((n) => n.module === null || modules.has(n.module));
+  const isDemoUser = !!user.email && user.email.startsWith("demo-") && user.email.endsWith("@gestek.app");
 
   const handleSignOut = async () => {
     clear();
